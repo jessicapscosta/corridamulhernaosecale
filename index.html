@@ -14,7 +14,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bk);color:var(--wh);overf
 #C{width:10px;height:10px;background:var(--pk);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);mix-blend-mode:difference;}
 #CR{width:36px;height:36px;border:1.5px solid rgba(255,31,110,.45);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);}
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:40px 80px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,backdrop-filter .4s;}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:40px 50px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,backdrop-filter .4s;}
 nav.sk{background:rgba(8,8,8,.92);backdrop-filter:blur(22px);border-bottom:1px solid rgba(255,31,110,.1);}
 .nl{display:flex;align-items:center;height:38px;}
 .nl img{height:38px;width:auto;}
@@ -27,7 +27,7 @@ nav.sk{background:rgba(8,8,8,.92);backdrop-filter:blur(22px);border-bottom:1px s
 .n-ig:hover{color:var(--pk);}
 .n-ig svg{width:17px;height:17px;}
 /* HERO */
-#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:start;position:relative;overflow:hidden;padding-left:80px;padding-right:80px;padding-top:100px;}
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:start;position:relative;overflow:hidden;padding-left:50px;padding-right:50px;padding-top:100px;}
 .hn{position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px;}
 .hgr{position:absolute;inset:0;background-image:linear-gradient(rgba(255,31,110,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,31,110,.04) 1px,transparent 1px);background-size:64px 64px;animation:gs 28s linear infinite;}
 @keyframes gs{to{background-position:0 64px;}}
