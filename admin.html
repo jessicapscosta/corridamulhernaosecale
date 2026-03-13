@@ -235,10 +235,24 @@ tr:hover td{background:rgba(255,31,110,.04);}
   </div>
 </div>
 
-<script type="module">
+<script>
+// Carrega Firebase dinamicamente e inicializa tudo
+(async function() {
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, setDoc, getDoc, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    window._fbLib = { initializeApp, getFirestore, doc, setDoc, getDoc, collection, getDocs };
+    const fbApp = initializeApp(FB_CONFIG);
+    window._db = getFirestore(fbApp);
+  } catch(e) { console.warn('Firebase init error:', e); }
+  // Inicializa o ADM após Firebase estar pronto
+  if(typeof initAdm === 'function') initAdm();
+})();
+</script>
+
+<script>
+
 // FIREBASE IMPORTS
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const FB_CONFIG = {
   apiKey: "AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",
@@ -248,8 +262,7 @@ const FB_CONFIG = {
   messagingSenderId: "545833671209",
   appId: "1:545833671209:web:3cc2e246aa2baf56af1a38"
 };
-const fbApp = initializeApp(FB_CONFIG);
-const db = getFirestore(fbApp);
+// Firebase inicializado acima via import dinâmico
 
 // CLOUDINARY
 const CLD_CLOUD = "dgqxadsmt";
@@ -274,35 +287,8 @@ let igCfg=JSON.parse(localStorage.getItem('igConfig')||'{}');
 let imgData=JSON.parse(localStorage.getItem('imgData')||'{}');
 let gallImgs=JSON.parse(localStorage.getItem('galleryImgs')||'[]');
 
-async function loadFromFirebase() {
-  try {
-    const keys = ['inscricoes','siteTexts','parceiros','igConfig','imgData','galleryImgs'];
-    const snaps = await Promise.all(keys.map(k => getDoc(doc(db,'site',k))));
-    snaps.forEach((snap, i) => {
-      if(!snap.exists()) return;
-      const d = snap.data();
-      const val = d.list !== undefined ? d.list : d;
-      localStorage.setItem(keys[i], JSON.stringify(val));
-    });
-    inscs    = JSON.parse(localStorage.getItem('inscricoes')||'[]');
-    txts     = JSON.parse(localStorage.getItem('siteTexts')||'{}');
-    parc     = JSON.parse(localStorage.getItem('parceiros')||'[]');
-    igCfg    = JSON.parse(localStorage.getItem('igConfig')||'{}');
-    imgData  = JSON.parse(localStorage.getItem('imgData')||'{}');
-    gallImgs = JSON.parse(localStorage.getItem('galleryImgs')||'[]');
-  } catch(e) { console.warn('Firebase load error:', e); }
-}
 
-async function save(key, data) {
-  try {
-    if(Array.isArray(data)) {
-      await setDoc(doc(db,'site',key), {list: data});
-    } else {
-      await setDoc(doc(db,'site',key), data);
-    }
-  } catch(e) { console.warn('Firebase write error:', e); }
-  localStorage.setItem(key, JSON.stringify(data));
-}
+
 
 // NAV
 const titles={dashboard:'Dashboard',inscricoes:'Inscrições',logos:'Logos, Favicon & Kit',atleta:'Imagem Atleta (Hero)',textos:'Textos do Site',galeria:'Galeria de Fotos',parceiros:'Parceiros',instagram:'Instagram'};
@@ -515,6 +501,52 @@ window.saveParc=saveParc; window.addParc=addParc; window.rmParc=rmParc;
 window.saveIG=saveIG; window.renderFull=renderFull; window.chgSt=chgSt;
 window.delRow=delRow; window.clearAll=clearAll; window.exportCSV=exportCSV;
 window.exportPDF=exportPDF; window.dl=dl;
+
+
+// Wrapper para usar Firebase do window
+function getDb() { return window._db; }
+function fbDoc(...args) { return window._fbLib.doc(...args); }
+function fbSetDoc(...args) { return window._fbLib.setDoc(...args); }
+function fbGetDoc(...args) { return window._fbLib.getDoc(...args); }
+
+async function save(key, data) {
+  try {
+    const db = getDb();
+    if(db) {
+      if(Array.isArray(data)) {
+        await fbSetDoc(fbDoc(db,'site',key), {list: data});
+      } else {
+        await fbSetDoc(fbDoc(db,'site',key), data);
+      }
+    }
+  } catch(e) { console.warn('Firebase write error:', e); }
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+async function loadFromFirebase() {
+  try {
+    const db = getDb();
+    if(!db) return;
+    const keys = ['inscricoes','siteTexts','parceiros','igConfig','imgData','galleryImgs'];
+    const snaps = await Promise.all(keys.map(k => fbGetDoc(fbDoc(db,'site',k))));
+    snaps.forEach((snap, i) => {
+      if(!snap.exists()) return;
+      const d = snap.data();
+      const val = d.list !== undefined ? d.list : d;
+      localStorage.setItem(keys[i], JSON.stringify(val));
+    });
+    inscs    = JSON.parse(localStorage.getItem('inscricoes')||'[]');
+    txts     = JSON.parse(localStorage.getItem('siteTexts')||'{}');
+    parc     = JSON.parse(localStorage.getItem('parceiros')||'[]');
+    igCfg    = JSON.parse(localStorage.getItem('igConfig')||'{}');
+    imgData  = JSON.parse(localStorage.getItem('imgData')||'{}');
+    gallImgs = JSON.parse(localStorage.getItem('galleryImgs')||'[]');
+  } catch(e) { console.warn('Firebase load error:', e); }
+}
+
+function initAdm() {
+  loadFromFirebase().then(()=>renderDash());
+}
 </script>
 </body>
 </html>

@@ -276,7 +276,29 @@ nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:30px 80px;display:fl
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
+// ══════════════════════════════════════════════
+// EMAILJS CONFIG — preencha com seus dados
+// Crie conta grátis em emailjs.com
+// ══════════════════════════════════════════════
+const EMAILJS_SERVICE_ID  = 'SEU_SERVICE_ID';   // ex: 'service_abc123'
+const EMAILJS_TEMPLATE_ID = 'SEU_TEMPLATE_ID';  // ex: 'template_xyz456'
+const EMAILJS_PUBLIC_KEY  = 'SUA_PUBLIC_KEY';   // ex: 'aBcDeFgHiJ...'
+// ══════════════════════════════════════════════
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// FIREBASE CONFIG
+window._FB_CONFIG = {
+  apiKey: "AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",
+  authDomain: "corrida-mulher.firebaseapp.com",
+  projectId: "corrida-mulher",
+  storageBucket: "corrida-mulher.firebasestorage.app",
+  messagingSenderId: "545833671209",
+  appId: "1:545833671209:web:3cc2e246aa2baf56af1a38"
+};
+
 // particles
 const pc=document.getElementById('pc');
 pc.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:0';
@@ -327,132 +349,148 @@ function showErr(id,msg,show){
   if(inp)inp.style.borderColor=show?'#ff4444':'';
 }
 
-async function submitForm(){
+function submitForm(){
   const sel=document.querySelector('.mod-opt.selected');
-  if(!sel){document.getElementById('modErr').style.display='block';window.scrollTo(0,0);return}
+  if(!sel){document.getElementById('modErr').style.display='block';window.scrollTo(0,0);return;}
 
-  const nome=document.getElementById('f-nome').value.trim();
-  const cpf=document.getElementById('f-cpf').value.trim();
-  const nasc=document.getElementById('f-nasc').value;
-  const sexo=document.getElementById('f-sexo').value;
-  const email=document.getElementById('f-email').value.trim();
-  const tel=document.getElementById('f-tel').value.trim();
-  const cidade=document.getElementById('f-cidade').value.trim();
-  const camiseta=document.getElementById('f-camiseta').value;
-  const emerg=document.getElementById('f-emerg').value.trim();
-  const termos=document.getElementById('f-termos').checked;
+  const nome     = document.getElementById('f-nome').value.trim();
+  const cpf      = document.getElementById('f-cpf').value.trim();
+  const nasc     = document.getElementById('f-nasc').value;
+  const sexo     = document.getElementById('f-sexo').value;
+  const email    = document.getElementById('f-email').value.trim();
+  const tel      = document.getElementById('f-tel').value.trim();
+  const cidade   = document.getElementById('f-cidade').value.trim();
+  const camiseta = document.getElementById('f-camiseta').value;
+  const emerg    = document.getElementById('f-emerg').value.trim();
+  const termos   = document.getElementById('f-termos').checked;
 
   let ok=true;
-  if(!nome){showErr('nome','Campo obrigatório',true);ok=false}else showErr('nome','',false);
-  if(!validCPF(cpf)){showErr('cpf','CPF inválido',true);ok=false}else showErr('cpf','',false);
-  if(!nasc){showErr('nasc','Campo obrigatório',true);ok=false}else showErr('nasc','',false);
-  if(!sexo){showErr('sexo','Campo obrigatório',true);ok=false}else showErr('sexo','',false);
-  if(!email||!email.includes('@')){showErr('email','E-mail inválido',true);ok=false}else showErr('email','',false);
-  if(!tel){showErr('tel','Campo obrigatório',true);ok=false}else showErr('tel','',false);
-  if(!cidade){showErr('cidade','Campo obrigatório',true);ok=false}else showErr('cidade','',false);
-  if(!camiseta){showErr('camiseta','Campo obrigatório',true);ok=false}else showErr('camiseta','',false);
-  if(!emerg){showErr('emerg','Campo obrigatório',true);ok=false}else showErr('emerg','',false);
-  if(!termos){document.getElementById('e-termos').style.display='block';ok=false}else document.getElementById('e-termos').style.display='none';
-  if(!ok){document.querySelector('.err-msg[style*="block"]')?.scrollIntoView({behavior:'smooth',block:'center'});return}
+  if(!nome)         {showErr('nome','Campo obrigatório',true);ok=false;}  else showErr('nome','',false);
+  if(!validCPF(cpf)){showErr('cpf','CPF inválido',true);ok=false;}        else showErr('cpf','',false);
+  if(!nasc)         {showErr('nasc','Campo obrigatório',true);ok=false;}  else showErr('nasc','',false);
+  if(!sexo)         {showErr('sexo','Campo obrigatório',true);ok=false;}  else showErr('sexo','',false);
+  if(!email||!email.includes('@')){showErr('email','E-mail inválido',true);ok=false;} else showErr('email','',false);
+  if(!tel)          {showErr('tel','Campo obrigatório',true);ok=false;}   else showErr('tel','',false);
+  if(!cidade)       {showErr('cidade','Campo obrigatório',true);ok=false;}else showErr('cidade','',false);
+  if(!camiseta)     {showErr('camiseta','Campo obrigatório',true);ok=false;}else showErr('camiseta','',false);
+  if(!emerg)        {showErr('emerg','Campo obrigatório',true);ok=false;} else showErr('emerg','',false);
+  if(!termos){document.getElementById('e-termos').style.display='block';ok=false;}
+  else document.getElementById('e-termos').style.display='none';
 
-  // generate runner number
-  let inscricoes=JSON.parse(localStorage.getItem('inscricoes')||'[]');
-  // Carrega do Firebase se disponível
-  try {
-    const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-    const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const fbApp2 = getApps().find(a=>a.name==='inscricao') || initializeApp(window._FB_CONFIG || {}, 'inscricao');
-    const db2 = getFirestore(fbApp2);
-    const snap = await getDoc(doc(db2,'site','inscricoes'));
-    if(snap.exists()) inscricoes = snap.data().list || [];
-  } catch(e) { /* usa localStorage */ }
-  const num=String(inscricoes.length+1).padStart(4,'0');
-  const id='CM2026-'+num+'-'+Date.now().toString(36).toUpperCase();
-  const mod=sel.dataset.mod;
-  const nascFmt=nasc?new Date(nasc+'T00:00:00').toLocaleDateString('pt-BR'):'';
-  const now=new Date().toLocaleString('pt-BR');
+  if(!ok){
+    document.querySelector('.err-msg[style*="block"]')?.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
 
-  const entry={id,numero:num,nome,cpf,nasc:nascFmt,sexo,social:document.getElementById('f-social').value.trim(),email,tel,cidade,camiseta,emergencia:emerg,medicamentos:document.getElementById('f-med').value.trim(),modalidade:mod,data:now,status:'novo'};
+  // Bloqueia botão para evitar duplo clique
+  const btn = document.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'PROCESSANDO...';
+
+  // Gera número do participante
+  const inscricoes = JSON.parse(localStorage.getItem('inscricoes')||'[]');
+  const num  = String(inscricoes.length + 1).padStart(4,'0');
+  const id   = 'CM2026-' + num + '-' + Date.now().toString(36).toUpperCase();
+  const mod  = sel.dataset.mod;
+  const nascFmt = nasc ? new Date(nasc+'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const now  = new Date().toLocaleString('pt-BR');
+
+  const entry = {
+    id, numero:num, nome, cpf, nasc:nascFmt, sexo,
+    social: document.getElementById('f-social').value.trim(),
+    email, tel, cidade, camiseta,
+    emergencia: emerg,
+    medicamentos: document.getElementById('f-med').value.trim(),
+    modalidade: mod, data: now, status:'novo'
+  };
+
   inscricoes.push(entry);
-  localStorage.setItem('inscricoes',JSON.stringify(inscricoes));
-  // Salva no Firebase
-  try {
-    const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-    const { getFirestore, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const fbApp2 = getApps().find(a=>a.name==='inscricao') || initializeApp(window._FB_CONFIG || {}, 'inscricao');
-    const db2 = getFirestore(fbApp2);
-    await setDoc(doc(db2,'site','inscricoes'), {list: inscricoes});
-  } catch(e) { console.warn('Firebase inscricao save error:', e); }
+  localStorage.setItem('inscricoes', JSON.stringify(inscricoes));
 
-  // show success
+  // Salva no Firebase em background (não bloqueia a tela de sucesso)
+  salvarFirebase(inscricoes);
+
+  // Envia email de confirmação via EmailJS (não bloqueia)
+  enviarEmail(nome, email, num, mod, nascFmt, camiseta, id, now);
+
+  // Mostra tela de sucesso IMEDIATAMENTE
+  mostrarSucesso(num, mod, nome, cpf, email, tel, nascFmt, camiseta, now, id);
+}
+
+function mostrarSucesso(num, mod, nome, cpf, email, tel, nascFmt, camiseta, now, id){
   document.getElementById('formPage').style.display='none';
-  document.getElementById('stepsEl').querySelectorAll('.step').forEach(s=>{s.classList.remove('active');s.classList.add('done');s.querySelector('.step-num').textContent='✓'});
+  document.getElementById('stepsEl').querySelectorAll('.step').forEach(s=>{
+    s.classList.remove('active');
+    s.classList.add('done');
+    s.querySelector('.step-num').textContent='✓';
+  });
   document.getElementById('s3').classList.add('active');
-  document.getElementById('successPage').style.display='block';
+  const sp = document.getElementById('successPage');
+  sp.style.display='block';
+  sp.style.opacity='1';
 
-  // populate bib
-  document.getElementById('bibNum').textContent='#'+num;
-  document.getElementById('bibMod').textContent=mod;
-  document.getElementById('bName').textContent=nome;
-  document.getElementById('bCpf').textContent=cpf;
-  document.getElementById('bEmail').textContent=email;
-  document.getElementById('bTel').textContent=tel;
-  document.getElementById('bNasc').textContent=nascFmt;
-  document.getElementById('bCam').textContent='Camiseta '+camiseta;
-  document.getElementById('bData').textContent=now;
-  document.getElementById('bId').textContent='ID: '+id;
+  document.getElementById('bibNum').textContent  = '#'+num;
+  document.getElementById('bibMod').textContent  = mod;
+  document.getElementById('bName').textContent   = nome;
+  document.getElementById('bCpf').textContent    = cpf;
+  document.getElementById('bEmail').textContent  = email;
+  document.getElementById('bTel').textContent    = tel;
+  document.getElementById('bNasc').textContent   = nascFmt;
+  document.getElementById('bCam').textContent    = 'Camiseta '+camiseta;
+  document.getElementById('bData').textContent   = now;
+  document.getElementById('bId').textContent     = 'ID: '+id;
 
-  // QR code
-  drawQR(id,nome,num,mod);
+  drawQR(id, nome, num, mod);
   window.scrollTo(0,0);
 }
 
-// Simple QR code generator (matrix-based)
+async function salvarFirebase(inscricoes){
+  try {
+    const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const app = getApps().find(a=>a.name==='inscricao') || initializeApp(window._FB_CONFIG, 'inscricao');
+    const db  = getFirestore(app);
+    await setDoc(doc(db,'site','inscricoes'), {list: inscricoes});
+  } catch(e){ console.warn('Firebase save:', e); }
+}
+
+function enviarEmail(nome, email, num, mod, nasc, camiseta, id, data){
+  if(EMAILJS_SERVICE_ID === 'SEU_SERVICE_ID') return; // não configurado ainda
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_name:    nome,
+    to_email:   email,
+    numero:     '#' + num,
+    modalidade: mod,
+    nascimento: nasc,
+    camiseta:   camiseta,
+    id_inscricao: id,
+    data_inscricao: data,
+    evento:     'Corrida Mulher, Não Se Cale! — Brasília/DF, Outubro 2026'
+  }).catch(e => console.warn('EmailJS:', e));
+}
+
 function drawQR(id,nome,num,mod){
   const canvas=document.getElementById('qrCanvas');
   const ctx=canvas.getContext('2d');
   const data=`CORRIDA-MULHER-2026|ID:${id}|NUM:#${num}|ATLETA:${nome}|MOD:${mod}|VERIFICADO:Inside-Brasil`;
-  const size=canvas.width;
-  const cells=25;
-  const cell=size/cells;
-  ctx.fillStyle='#fff';
-  ctx.fillRect(0,0,size,size);
-  ctx.fillStyle='#111';
-  // deterministic pattern from string hash
+  const size=canvas.width;const cells=25;const cell=size/cells;
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);
   let hash=0;for(let i=0;i<data.length;i++)hash=(hash<<5)-hash+data.charCodeAt(i)|0;
   const rand=s=>{s=Math.sin(s+hash)*10000;return s-Math.floor(s)};
-  // position detection patterns
   function drawFinder(x,y){
     ctx.fillStyle='#111';ctx.fillRect(x*cell,y*cell,7*cell,7*cell);
     ctx.fillStyle='#fff';ctx.fillRect((x+1)*cell,(y+1)*cell,5*cell,5*cell);
     ctx.fillStyle='#111';ctx.fillRect((x+2)*cell,(y+2)*cell,3*cell,3*cell);
   }
   drawFinder(0,0);drawFinder(cells-7,0);drawFinder(0,cells-7);
-  // data modules
   for(let r=0;r<cells;r++){for(let c=0;c<cells;c++){
-    // skip finder pattern zones
     if((r<8&&c<8)||(r<8&&c>cells-9)||(r>cells-9&&c<8))continue;
     if(rand(r*cells+c)>.45){ctx.fillStyle='#111';ctx.fillRect(c*cell,r*cell,cell,cell)}
   }}
-  // gradient overlay for the pink-orange brand
   const grd=ctx.createLinearGradient(0,0,size,size);
   grd.addColorStop(0,'rgba(255,31,110,.08)');grd.addColorStop(1,'rgba(255,107,0,.08)');
   ctx.fillStyle=grd;ctx.fillRect(0,0,size,size);
 }
-</script>
-
-<script>
-// ══════════════════════════════════════════════
-// FIREBASE CONFIG — substitua pelos seus dados
-// ══════════════════════════════════════════════
-window._FB_CONFIG = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO_ID",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
-};
 </script>
 </body>
 </html>
