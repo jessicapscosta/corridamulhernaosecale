@@ -327,7 +327,7 @@ function showErr(id,msg,show){
   if(inp)inp.style.borderColor=show?'#ff4444':'';
 }
 
-function submitForm(){
+async function submitForm(){
   const sel=document.querySelector('.mod-opt.selected');
   if(!sel){document.getElementById('modErr').style.display='block';window.scrollTo(0,0);return}
 
@@ -359,9 +359,9 @@ function submitForm(){
   let inscricoes=JSON.parse(localStorage.getItem('inscricoes')||'[]');
   // Carrega do Firebase se disponível
   try {
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-    const { getFirestore, doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const fbApp2 = initializeApp(window._FB_CONFIG || {}, 'inscricao');
+    const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const fbApp2 = getApps().find(a=>a.name==='inscricao') || initializeApp(window._FB_CONFIG || {}, 'inscricao');
     const db2 = getFirestore(fbApp2);
     const snap = await getDoc(doc(db2,'site','inscricoes'));
     if(snap.exists()) inscricoes = snap.data().list || [];
@@ -377,9 +377,9 @@ function submitForm(){
   localStorage.setItem('inscricoes',JSON.stringify(inscricoes));
   // Salva no Firebase
   try {
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
     const { getFirestore, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const fbApp2 = initializeApp(window._FB_CONFIG || {}, 'inscricao');
+    const fbApp2 = getApps().find(a=>a.name==='inscricao') || initializeApp(window._FB_CONFIG || {}, 'inscricao');
     const db2 = getFirestore(fbApp2);
     await setDoc(doc(db2,'site','inscricoes'), {list: inscricoes});
   } catch(e) { console.warn('Firebase inscricao save error:', e); }
