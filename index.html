@@ -170,7 +170,7 @@ section{padding:108px 52px;position:relative;}
 .kit-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
 .kit-img-side{position:relative;display:flex;align-items:center;justify-content:center;min-height:400px;}
 .kit-glow{position:absolute;width:350px;height:350px;border-radius:50%;background:var(--g);opacity:.1;filter:blur(60px);animation:od 6s ease-in-out infinite alternate;}
-.kit-ph{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border:none;background:transparent;}
+.kit-img{position:relative;z-index:1;max-width:100%;max-height:460px;object-fit:contain;filter:drop-shadow(0 20px 60px rgba(255,31,110,.25));animation:kitBob 3.5s ease-in-out infinite alternate;}
 @keyframes kitBob{0%{transform:translateY(0);}100%{transform:translateY(-14px);}}
 .kit-ph{position:relative;z-index:1;width:300px;height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border:2px dashed rgba(255,31,110,.22);border-radius:24px;background:rgba(255,31,110,.03);}
 .kit-ph svg{width:44px;height:44px;opacity:.25;}
@@ -272,7 +272,7 @@ footer{background:var(--bk);border-top:1px solid rgba(255,255,255,.05);padding:6
 @media(max-width:900px){
   nav{padding:14px 20px;}.nm{display:none;}
   #hero{grid-template-columns:1fr;padding:0 20px;padding-top:80px;display:flex;flex-direction:column;}.hr{display:flex;height:auto;max-height:none;order:2;}.hl{padding:80px 0 20px;text-align:center;order:1;}.hb{justify-content:center;}#ath-wrap{position:relative;height:420px;width:100%;right:auto;bottom:auto;}.ath-img{height:420px;width:auto;margin:0 auto;display:block;}
-  .strip{position:relative;grid-template-columns:repeat(3,1fr);order:3;width:100vw;margin-left:-20px;margin-right:-20px;}
+  .strip{position:relative;grid-template-columns:repeat(3,1fr);order:3;margin-top:0;}
   .si{padding:12px 8px;gap:7px;flex-direction:column;align-items:center;text-align:center;}
   .sico{width:26px;height:26px;}
   .svl{font-size:.72rem;}
@@ -356,7 +356,7 @@ footer{background:var(--bk);border-top:1px solid rgba(255,255,255,.05);padding:6
 
   <!-- STRIP INFO -->
   <div class="strip">
-    <div class="si"><div class="sico"><svg viewBox="0 0 16 16" fill="none" stroke="var(--pk)" stroke-width="1.7"><path d="M8 8.5a2 2 0 100-4 2 2 0 000 4z"/><path d="M13.5 8c0 4.67-5.5 8-5.5 8S2.5 12.67 2.5 8a5.5 5.5 0 0111 0z"/></svg></div><div><span class="slb">Local</span><span class="svl">Brasília/DF</span></div></div>
+    <div class="si"><div class="sico"><svg viewBox="0 0 16 16" fill="none" stroke="var(--pk)" stroke-width="1.7"><path d="M8 8.5a2 2 0 100-4 2 2 0 000 4z"/><path d="M13.5 8c0 4.67-5.5 8-5.5 8S2.5 12.67 2.5 8a5.5 5.5 0 0111 0z"/></svg></div><div><span class="slb">Local</span><span class="svl">Eixão Sul · Brasília/DF</span></div></div>
     <div class="si"><div class="sico"><svg viewBox="0 0 16 16" fill="none" stroke="var(--pk)" stroke-width="1.7"><rect x="1.5" y="2.5" width="13" height="11" rx="2"/><path d="M1.5 6h13M5 1.5v2M11 1.5v2"/></svg></div><div><span class="slb">Data</span><span class="svl">Outubro de 2026</span></div></div>
     <div class="si"><div class="sico"><svg viewBox="0 0 16 16" fill="none" stroke="var(--pk)" stroke-width="1.7"><path d="M8 2a3.5 3.5 0 100 7A3.5 3.5 0 008 2zM2 14c0-2.76 2.69-5 6-5s6 2.24 6 5"/></svg></div><div><span class="slb">Vagas</span><span class="svl">2.000 atletas</span></div></div>
   </div>
