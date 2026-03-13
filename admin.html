@@ -236,7 +236,7 @@ tr:hover td{background:rgba(255,31,110,.04);}
 </div>
 
 <script type="module">
-// FIREBASE IMPORTS (devem vir primeiro)
+// FIREBASE IMPORTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -251,6 +251,21 @@ const FB_CONFIG = {
 const fbApp = initializeApp(FB_CONFIG);
 const db = getFirestore(fbApp);
 
+// CLOUDINARY
+const CLD_CLOUD = "dgqxadsmt";
+const CLD_PRESET = "corrida_mulher";
+
+async function uploadCloudinary(file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', CLD_PRESET);
+  fd.append('folder', 'corrida-mulher');
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLD_CLOUD}/image/upload`, {method:'POST',body:fd});
+  const data = await res.json();
+  if(!data.secure_url) throw new Error('Upload falhou: ' + JSON.stringify(data));
+  return data.secure_url;
+}
+
 // STATE
 let inscs=JSON.parse(localStorage.getItem('inscricoes')||'[]');
 let txts=JSON.parse(localStorage.getItem('siteTexts')||'{}');
@@ -259,7 +274,6 @@ let igCfg=JSON.parse(localStorage.getItem('igConfig')||'{}');
 let imgData=JSON.parse(localStorage.getItem('imgData')||'{}');
 let gallImgs=JSON.parse(localStorage.getItem('galleryImgs')||'[]');
 
-// Carrega dados do Firebase ao iniciar
 async function loadFromFirebase() {
   try {
     const keys = ['inscricoes','siteTexts','parceiros','igConfig','imgData','galleryImgs'];
@@ -276,10 +290,18 @@ async function loadFromFirebase() {
     igCfg    = JSON.parse(localStorage.getItem('igConfig')||'{}');
     imgData  = JSON.parse(localStorage.getItem('imgData')||'{}');
     gallImgs = JSON.parse(localStorage.getItem('galleryImgs')||'[]');
-    // Re-renderiza a aba atual com dados frescos
-    const active = document.querySelector('.si.active');
-    if(active) active.click();
   } catch(e) { console.warn('Firebase load error:', e); }
+}
+
+async function save(key, data) {
+  try {
+    if(Array.isArray(data)) {
+      await setDoc(doc(db,'site',key), {list: data});
+    } else {
+      await setDoc(doc(db,'site',key), data);
+    }
+  } catch(e) { console.warn('Firebase write error:', e); }
+  localStorage.setItem(key, JSON.stringify(data));
 }
 
 // NAV
@@ -306,7 +328,7 @@ function renderDash(){
     <div class="sc"><div class="scl">Novas</div><div class="scv">${nv}</div><div class="scs">Aguardando revisão</div></div>
     <div class="sc"><div class="scl">Distribuição</div><div class="scv">${m3}·${m5}·${m10}</div><div class="scs">3km · 5km · 10km</div></div>
     <div class="sc"><div class="scl">Meta</div><div class="scv">${Math.round(inscs.length/2000*100)}%</div><div class="scs">de 2.000 vagas</div></div>`;
-  document.getElementById('recentTbl').innerHTML=inscs.length?tblHTML(inscs.slice(-5).reverse(),false):'<div class="es"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="8" width="40" height="32" rx="3"/><path d="M12 18h24M12 26h16M12 34h10"/></svg><p>Sem inscrições</p></div>';
+  document.getElementById('recentTbl').innerHTML=inscs.length?tblHTML(inscs.slice(-5).reverse(),false):'<div class="es"><p>Sem inscrições</p></div>';
 }
 
 function tblHTML(data,full){
@@ -317,10 +339,7 @@ function tblHTML(data,full){
       <td>${r.mod}</td><td>${r.cam}</td>
       <td style="font-size:.74rem;color:rgba(255,255,255,.32)">${r.data}</td>
       <td><span class="bgg ${r.status==='novo'?'bn':r.status==='lido'?'bl':'bo'}">${{novo:'🔴 Novo',lido:'🟡 Lido',ok:'✅ OK'}[r.status]||r.status}</span></td>
-      ${full?`<td><div class="ta2">
-        <button class="tb2" onclick="chgSt(${i})">Status</button>
-        <button class="tb2 dl" onclick="delRow(${i})">✕</button>
-      </div></td>`:''}
+      ${full?`<td><div class="ta2"><button class="tb2" onclick="chgSt(${i})">Status</button><button class="tb2 dl" onclick="delRow(${i})">✕</button></div></td>`:''}
     </tr>`;}).join('')
   }</tbody></table>`;
 }
@@ -329,72 +348,85 @@ function renderFull(){
   inscs=JSON.parse(localStorage.getItem('inscricoes')||'[]');
   const q=(document.getElementById('srcInp')?.value||'').toLowerCase();
   const fd=q?inscs.filter(r=>r.nome?.toLowerCase().includes(q)||r.email?.toLowerCase().includes(q)):inscs;
-  document.getElementById('fullTbl').innerHTML=fd.length?tblHTML([...fd].reverse(),true):'<div class="es"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="8" width="40" height="32" rx="3"/><path d="M12 18h24M12 26h16M12 34h10"/></svg><p>Nenhuma encontrada</p></div>';
+  document.getElementById('fullTbl').innerHTML=fd.length?tblHTML([...fd].reverse(),true):'<div class="es"><p>Nenhuma encontrada</p></div>';
 }
 function chgSt(i){const s=inscs[i].status;inscs[i].status=s==='novo'?'lido':s==='lido'?'ok':'novo';save('inscricoes',inscs);renderFull();}
 function delRow(i){if(!confirm('Excluir?'))return;inscs.splice(i,1);save('inscricoes',inscs);renderFull();renderDash();}
 function clearAll(){if(!confirm('Excluir TODAS as inscrições?'))return;inscs=[];save('inscricoes',inscs);renderFull();renderDash();}
 
-// EXPORT CSV
 function exportCSV(){
   if(!inscs.length){alert('Sem inscrições.');return;}
   const h=['#','Nome','CPF','Email','Telefone','Nascimento','Sexo','Endereço','Emergência','Modalidade','Camiseta','Data','Status'];
   const rows=inscs.map(r=>[r.num,r.nome,r.cpf,r.email,r.tel,r.nasc,r.sexo,r.end,r.emerg,r.mod,r.cam,r.data,r.status]);
-  dl('\uFEFF'+[h,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n'),'inscricoes.csv','text/csv');
+  const bom='\uFEFF';
+  dl(bom+[h,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n'),'inscricoes.csv','text/csv');
 }
 function exportPDF(){
   if(!inscs.length){alert('Sem inscrições.');return;}
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inscrições</title><style>body{font-family:Arial;padding:20px;color:#000}h1{color:#FF1F6E;font-size:15px;margin-bottom:4px}p{font-size:10px;color:#666;margin-bottom:14px}table{width:100%;border-collapse:collapse;font-size:9.5px}th{background:#FF1F6E;color:#fff;padding:6px 7px;text-align:left}td{padding:5px 7px;border-bottom:1px solid #eee}tr:nth-child(even)td{background:#fff5f8}</style></head><body><h1>Corrida Mulher, Não Se Cale! — Inscrições</h1><p>Gerado em ${new Date().toLocaleString('pt-BR')} · Total: ${inscs.length}</p><table><tr><th>#</th><th>Nome</th><th>CPF</th><th>Email</th><th>Tel</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th></tr>${inscs.map(r=>`<tr><td>${r.num||'—'}</td><td>${r.nome}</td><td>${r.cpf}</td><td>${r.email}</td><td>${r.tel}</td><td>${r.mod}</td><td>${r.cam}</td><td>${r.data}</td><td>${r.status}</td></tr>`).join('')}</table></body></html>`);
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inscrições</title><style>body{font-family:Arial;padding:20px;color:#000}h1{color:#FF1F6E;font-size:15px}table{width:100%;border-collapse:collapse;font-size:9.5px}th{background:#FF1F6E;color:#fff;padding:6px 7px;text-align:left}td{padding:5px 7px;border-bottom:1px solid #eee}</style></head><body><h1>Corrida Mulher — Inscrições</h1><p>Total: '+inscs.length+'</p><table><tr><th>#</th><th>Nome</th><th>CPF</th><th>Email</th><th>Tel</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th></tr>'+inscs.map(r=>'<tr><td>'+(r.num||'—')+'</td><td>'+r.nome+'</td><td>'+r.cpf+'</td><td>'+r.email+'</td><td>'+r.tel+'</td><td>'+r.mod+'</td><td>'+r.cam+'</td><td>'+r.data+'</td><td>'+r.status+'</td></tr>').join('')+'</table></body></html>');
   w.document.close();setTimeout(()=>w.print(),500);
 }
 
 // LOGOS
 const logoSlots=[
-  {key:'logoNav',label:'Logo Navbar (topo)',hint:'Recomendado: PNG ou SVG, altura ~36px'},
-  {key:'logoFooter',label:'Logo Rodapé',hint:'Recomendado: PNG ou SVG, altura ~44px'},
-  {key:'favicon',label:'Favicon (aba do navegador)',hint:'Recomendado: PNG quadrado, 32×32 ou 64×64'},
-  {key:'kit',label:'Imagem do Kit (seção Kit)',hint:'Recomendado: PNG sem fundo, foto do kit completo'},
+  {key:'logoNav',label:'Logo Navbar (topo)',hint:'PNG ou SVG, altura ~36px'},
+  {key:'logoFooter',label:'Logo Rodapé',hint:'PNG ou SVG, altura ~44px'},
+  {key:'favicon',label:'Favicon',hint:'PNG quadrado, 32x32 ou 64x64'},
+  {key:'kit',label:'Imagem do Kit',hint:'PNG sem fundo'},
 ];
 function renderLogos(){
   document.getElementById('logoGrid').innerHTML=logoSlots.map(s=>`
     <div class="lc">
-      <div class="lp" id="lp-${s.key}">${imgData[s.key]?`<img src="${imgData[s.key]}" alt="">`:
-        `<svg viewBox="0 0 36 36" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1.4"><rect x="2" y="8" width="32" height="20" rx="4"/><path d="M8 20h6M8 24h4"/></svg>`}</div>
+      <div class="lp" id="lp-${s.key}">${imgData[s.key]?`<img src="${imgData[s.key]}" alt="" style="max-width:140px;max-height:80px;object-fit:contain;">`:'<svg viewBox="0 0 36 36" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1.4"><rect x="2" y="8" width="32" height="20" rx="4"/></svg>'}</div>
       <div class="li"><p>${s.label}<br><small style="font-size:.68rem;color:rgba(255,255,255,.28);">${s.hint}</small></p>
       <label class="lil" for="lf-${s.key}">📁 Trocar</label>
       <input class="lif" type="file" id="lf-${s.key}" accept="image/*" onchange="previewLogo(this,'${s.key}')"></div>
     </div>`).join('');
 }
-function previewLogo(inp,key){
-  console.log('previewLogo key='+key, inp.files[0]?.name);
+async function previewLogo(inp,key){
   if(!inp.files[0]) return;
-  readImg(inp.files[0],d=>{
-    console.log('readImg ok bytes='+d.length);
-    imgData[key]=d;
-    const el=document.getElementById('lp-'+key);
-    if(!el){console.error('elem nao achado lp-'+key);return;}
-    el.innerHTML=`<img src="${d}" alt="" style="max-width:140px;max-height:80px;object-fit:contain;">`;
-    console.log('preview ok!');
-  });
+  const el=document.getElementById('lp-'+key);
+  el.innerHTML='<span style="color:rgba(255,255,255,.4);font-size:.75rem">⏳ Enviando...</span>';
+  try {
+    const url=await uploadCloudinary(inp.files[0]);
+    imgData[key]=url;
+    el.innerHTML=`<img src="${url}" alt="" style="max-width:140px;max-height:80px;object-fit:contain;">`;
+    flash('logoMsg','✅ Enviado! Clique em Salvar.');
+  } catch(e) {
+    el.innerHTML='<span style="color:#ff6666;font-size:.75rem">❌ Erro no upload</span>';
+    console.error(e);
+  }
 }
 function saveLogo(){save('imgData',imgData);flash('logoMsg','✅ Logos salvas!');}
 
 // ATLETA
-let athTmp=null;
 function renderAth(){
   const p=document.getElementById('athPreview');
   if(imgData.runner)p.innerHTML=`<img src="${imgData.runner}" style="max-height:260px;max-width:100%;object-fit:contain;" alt="">`;
 }
-function previewAth(inp){readImg(inp.files[0],d=>{athTmp=d;document.getElementById('athPreview').innerHTML=`<img src="${d}" style="max-height:260px;max-width:100%;object-fit:contain;" alt="">`;});}
-function saveAth(){if(athTmp)imgData.runner=athTmp;save('imgData',imgData);flash('athMsg','✅ Imagem salva!');}
+async function previewAth(inp){
+  if(!inp.files[0]) return;
+  const p=document.getElementById('athPreview');
+  p.innerHTML='<span style="color:rgba(255,255,255,.4)">⏳ Enviando...</span>';
+  try {
+    const url=await uploadCloudinary(inp.files[0]);
+    imgData.runner=url;
+    p.innerHTML=`<img src="${url}" style="max-height:260px;max-width:100%;object-fit:contain;" alt="">`;
+    flash('athMsg','✅ Enviado! Clique em Salvar.');
+  } catch(e) {
+    p.innerHTML='<span style="color:#ff6666">❌ Erro</span>';
+    console.error(e);
+  }
+}
+function saveAth(){save('imgData',imgData);flash('athMsg','✅ Imagem salva!');}
 
 // TEXTS
 const txFields=[
   {key:'h1a',label:'Hero — Linha 1',def:'CORRIDA'},
   {key:'h1b',label:'Hero — Linha 2 (destaque)',def:'Mulher,'},
   {key:'h1c',label:'Hero — Linha 3',def:'NÃO SE CALE!'},
-  {key:'heroImpact',label:'Hero — Frase de impacto (HTML ok)',def:'<strong>Cada passo é um ato contra a violência.</strong><br>Esporte, empoderamento e transformação reunidos.',ta:true},
+  {key:'heroImpact',label:'Hero — Frase de impacto',def:'<strong>Cada passo é um ato contra a violência.</strong><br>Esporte, empoderamento e transformação reunidos.',ta:true},
   {key:'footerDesc',label:'Rodapé — Descrição',def:'Esporte · Conscientização · Transformação',ta:true},
 ];
 function renderTexts(){
@@ -411,24 +443,27 @@ function renderGalAdm(){
     <div class="gi">
       <img src="${s}" alt="Foto ${i+1}">
       <div class="gi-over">
-        <button class="gi-btn" onclick="dlImg('${s}',${i})" title="Baixar"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v8M4.5 6.5L7 9l2.5-2.5M1.5 11.5v1a1 1 0 001 1h9a1 1 0 001-1v-1"/></svg></button>
         <button class="gi-btn dl" onclick="rmGal(${i})" title="Remover"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 4h11M4.5 4V3a1 1 0 011-1h3a1 1 0 011 1v1M5.5 6.5v4M8.5 6.5v4M2.5 4l1 8a1 1 0 001 1h6a1 1 0 001-1l1-8"/></svg></button>
       </div>
     </div>`).join('');
 }
-function addGalImgs(inp){
+async function addGalImgs(inp){
   const files=Array.from(inp.files);
-  let done=0;
-  files.forEach(f=>{readImg(f,d=>{gallImgs.push(d);done++;if(done===files.length)renderGalAdm();});});
+  if(!files.length) return;
+  flash('galMsg','⏳ Enviando '+files.length+' foto(s)...');
+  try {
+    const urls=await Promise.all(files.map(f=>uploadCloudinary(f)));
+    gallImgs.push(...urls);
+    renderGalAdm();
+    flash('galMsg','✅ '+files.length+' foto(s) enviadas! Clique em Salvar.');
+  } catch(e) {
+    flash('galMsg','❌ Erro no upload');
+    console.error(e);
+  }
   inp.value='';
 }
 function rmGal(i){gallImgs.splice(i,1);renderGalAdm();}
-function saveGal(){save('galleryImgs',gallImgs);flash('galMsg',`✅ ${gallImgs.length} fotos salvas!`);}
-function dlImg(src,i){const a=document.createElement('a');a.href=src;a.download=`foto-${i+1}.jpg`;a.click();}
-function downloadAll(){
-  if(!gallImgs.length){alert('Sem fotos.');return;}
-  gallImgs.forEach((s,i)=>setTimeout(()=>dlImg(s,i),i*200));
-}
+function saveGal(){save('galleryImgs',gallImgs);flash('galMsg','✅ '+gallImgs.length+' fotos salvas!');}
 
 // PARCEIROS
 function renderParc(){
@@ -436,7 +471,20 @@ function renderParc(){
     <div class="pc"><div class="pcpv"><img src="${p}" alt="Parceiro ${i+1}"></div>
     <button class="pcr" onclick="rmParc(${i})">✕</button></div>`).join('');
 }
-function addParc(inp){readImg(inp.files[0],d=>{parc.push(d);renderParc();});inp.value='';}
+async function addParc(inp){
+  if(!inp.files[0]) return;
+  flash('parcMsg','⏳ Enviando...');
+  try {
+    const url=await uploadCloudinary(inp.files[0]);
+    parc.push(url);
+    renderParc();
+    flash('parcMsg','✅ Logo enviada! Clique em Salvar.');
+  } catch(e) {
+    flash('parcMsg','❌ Erro no upload');
+    console.error(e);
+  }
+  inp.value='';
+}
 function rmParc(i){parc.splice(i,1);renderParc();}
 function saveParc(){save('parceiros',parc);flash('parcMsg','✅ Parceiros salvos!');}
 
@@ -452,50 +500,21 @@ function renderIG(){
 function saveIG(){igCfg={link:v('ig-link'),handle:v('ig-handle'),cap1:v('ig-c1'),cap2:v('ig-c2'),cap3:v('ig-c3')};save('igConfig',igCfg);flash('igMsg','✅ Salvo!');}
 
 // HELPERS
-function readImg(file,cb){const r=new FileReader();r.onload=e=>cb(e.target.result);r.readAsDataURL(file);}
-
-async function save(key, data) {
-  // Salva no Firebase E no localStorage (fallback offline)
-  try {
-    if(Array.isArray(data)) {
-      await setDoc(doc(db,'site',key), {list: data});
-    } else {
-      await setDoc(doc(db,'site',key), data);
-    }
-  } catch(e) { console.warn('Firebase write error:', e); }
-  localStorage.setItem(key, JSON.stringify(data));
-}
 function dl(content,name,type){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
-function flash(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.color='#00d060';setTimeout(()=>{el.textContent='';},2500);}
+function flash(id,msg){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.style.color='#00d060';setTimeout(()=>{if(el)el.textContent='';},3500);}
 function v(id){return document.getElementById(id)?.value||'';}
 
 // INIT
-loadFromFirebase().then(() => renderDash());
+loadFromFirebase().then(()=>renderDash());
 
-// Expor funções globais (necessário com type="module")
-window.goto = goto;
-window.saveLogo = saveLogo;
-window.previewLogo = previewLogo;
-window.saveAth = saveAth;
-window.previewAth = previewAth;
-window.saveTexts = saveTexts;
-window.saveGal = saveGal;
-window.addGalImgs = addGalImgs;
-window.rmGal = rmGal;
-window.dlImg = dlImg;
-window.downloadAll = downloadAll;
-window.saveParc = saveParc;
-window.addParc = addParc;
-window.rmParc = rmParc;
-window.saveIG = saveIG;
-window.renderFull = renderFull;
-window.chgSt = chgSt;
-window.delRow = delRow;
-window.clearAll = clearAll;
-window.exportCSV = exportCSV;
-window.exportPDF = exportPDF;
-window.dl = dl;
-window.readImg = readImg;
+// Expor funções globais
+window.goto=goto; window.saveLogo=saveLogo; window.previewLogo=previewLogo;
+window.saveAth=saveAth; window.previewAth=previewAth; window.saveTexts=saveTexts;
+window.saveGal=saveGal; window.addGalImgs=addGalImgs; window.rmGal=rmGal;
+window.saveParc=saveParc; window.addParc=addParc; window.rmParc=rmParc;
+window.saveIG=saveIG; window.renderFull=renderFull; window.chgSt=chgSt;
+window.delRow=delRow; window.clearAll=clearAll; window.exportCSV=exportCSV;
+window.exportPDF=exportPDF; window.dl=dl;
 </script>
 </body>
 </html>
