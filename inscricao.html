@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscrição — Corrida Mulher, Não Se Cale!</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#FF1F6E;--orange:#FF6B00;--black:#070508;--dark:#0f080d;--white:#fff;--grad:linear-gradient(135deg,#FF1F6E,#FF6B00)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);min-height:100vh;overflow-x:hidden}
+/* BG */
+.bg{position:fixed;inset:0;pointer-events:none;z-index:0}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,31,110,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,31,110,.04) 1px,transparent 1px);background-size:55px 55px;animation:gScroll 25s linear infinite}
+@keyframes gScroll{to{transform:translateY(55px)}}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:oFloat ease-in-out infinite}
+.o1{width:500px;height:500px;background:rgba(255,31,110,.18);top:-100px;left:-100px;animation-duration:12s}
+.o2{width:300px;height:300px;background:rgba(255,107,0,.15);bottom:-80px;right:-60px;animation-duration:15s;animation-delay:-5s}
+@keyframes oFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-30px)}}
+/* particle */
+.particle{position:fixed;border-radius:50%;animation:pFly linear infinite;opacity:0;pointer-events:none;z-index:0}
+@keyframes pFly{0%{opacity:0;transform:translateY(100vh)}15%{opacity:.8}85%{opacity:.3}100%{opacity:0;transform:translateY(-10vh)}}
+/* floating tags */
+.ftag{position:fixed;padding:7px 16px;border-radius:50px;font-family:'Montserrat',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:1px;pointer-events:none;animation:tfloat ease-in-out infinite;white-space:nowrap;backdrop-filter:blur(8px);z-index:1}
+@keyframes tfloat{0%,100%{transform:translateY(0) rotate(var(--rot,0deg))}50%{transform:translateY(-14px) rotate(var(--rot,0deg))}}
+.fp{background:rgba(255,31,110,.15);border:1px solid rgba(255,31,110,.4);color:var(--pink)}
+.fo{background:rgba(255,107,0,.13);border:1px solid rgba(255,107,0,.35);color:var(--orange)}
+.fw{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.8)}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,5,8,.7);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,31,110,.1)}
+.nav-logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:.9rem;letter-spacing:2px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
+.nav-back{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.55);text-decoration:none;font-size:.82rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:color .3s}
+.nav-back:hover{color:#fff}
+/* WRAP */
+.wrap{position:relative;z-index:2;max-width:720px;margin:0 auto;padding:110px 24px 80px}
+/* STEPS */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:48px;opacity:0;transform:translateY(20px);animation:fUp .7s forwards .2s}
+.step{display:flex;align-items:center;gap:10px;font-size:.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);transition:color .4s}
+.step.active{color:#fff}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;transition:background .4s,border-color .4s}
+.step.active .step-num{background:var(--grad);border-color:transparent}
+.step.done .step-num{background:rgba(0,200,80,.3);border-color:rgba(0,200,80,.5);color:#00c850}
+.step-line{flex:1;height:1px;background:rgba(255,255,255,.1);margin:0 12px}
+@keyframes fUp{to{opacity:1;transform:translateY(0)}}
+/* HEADER */
+.pg-head{text-align:center;margin-bottom:44px;opacity:0;animation:fUp .7s forwards .35s}
+.pg-eyebrow{font-size:.68rem;letter-spacing:4px;text-transform:uppercase;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;display:block}
+.pg-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:10px}
+.pg-title em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pg-sub{color:rgba(255,255,255,.5);font-size:.92rem}
+/* MOD SELECTOR */
+.mod-sel{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px;opacity:0;animation:fUp .7s forwards .5s}
+.mod-opt{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .3s,background .3s,transform .2s;position:relative}
+.mod-opt:hover{border-color:rgba(255,31,110,.4);background:rgba(255,31,110,.06);transform:translateY(-2px)}
+.mod-opt.selected{border-color:var(--pink);background:rgba(255,31,110,.1)}
+.mod-opt.selected::after{content:'✓';position:absolute;top:8px;right:10px;font-size:.7rem;font-weight:900;color:var(--pink)}
+.mod-km{font-family:'Montserrat',sans-serif;font-weight:900;font-size:2.2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.mod-nm{font-size:.8rem;font-weight:700;margin-top:4px}
+/* FORM BOX */
+.form-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,31,110,.18);border-radius:24px;padding:40px 36px;backdrop-filter:blur(12px);opacity:0;animation:fUp .7s forwards .65s}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.frow.full{grid-template-columns:1fr}
+.fg{display:flex;flex-direction:column;gap:7px}
+.fg label{font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:600}
+.fg input,.fg select,.fg textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:13px 16px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;transition:border-color .3s,background .3s,box-shadow .3s;-webkit-appearance:none;width:100%}
+.fg input::placeholder{color:rgba(255,255,255,.28)}
+.fg select option{background:#1a0812;color:#fff}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--pink);background:rgba(255,31,110,.07);box-shadow:0 0 0 3px rgba(255,31,110,.14)}
+.form-div{height:1px;background:rgba(255,255,255,.08);margin:22px 0}
+.form-section-label{font-size:.68rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.3);font-weight:700;margin-bottom:16px;margin-top:4px}
+.checkbox-wrap{display:flex;align-items:flex-start;gap:10px;margin-top:14px}
+.checkbox-wrap input[type="checkbox"]{width:18px;height:18px;accent-color:var(--pink);flex-shrink:0;margin-top:1px}
+.checkbox-wrap label{font-size:.84rem;color:rgba(255,255,255,.55);line-height:1.5;cursor:pointer}
+.submit-btn{width:100%;background:var(--grad);color:#fff;border:none;border-radius:13px;padding:17px;font-family:'Montserrat',sans-serif;font-weight:900;font-size:.95rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s;margin-top:22px}
+.submit-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.22),transparent);transform:translateX(-110%);transition:transform .5s}
+.submit-btn:hover::before{transform:translateX(110%)}
+.submit-btn:hover{transform:scale(1.02);box-shadow:0 8px 40px rgba(255,31,110,.5)}
+.form-note{text-align:center;font-size:.75rem;color:rgba(255,255,255,.28);margin-top:14px}
+.err-msg{color:#ff4444;font-size:.78rem;margin-top:4px;display:none}
+/* SUCCESS PAGE */
+#successPage{display:none;opacity:0;animation:fUp .7s forwards}
+.success-wrap{text-align:center;padding-bottom:40px}
+.suc-icon{width:80px;height:80px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto 20px;animation:popIn .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.suc-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:clamp(1.6rem,3vw,2.4rem);margin-bottom:8px}
+.suc-sub{color:rgba(255,255,255,.55);font-size:.95rem;margin-bottom:36px}
+/* bib number */
+.bib-card{background:rgba(255,255,255,.04);border:2px solid rgba(255,31,110,.35);border-radius:22px;padding:36px;max-width:440px;margin:0 auto 32px;position:relative;overflow:hidden}
+.bib-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,31,110,.08),rgba(255,107,0,.05));pointer-events:none}
+.bib-label{font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
+.bib-number{font-family:'Montserrat',sans-serif;font-weight:900;font-size:5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;animation:gnGlow 3s ease-in-out infinite alternate}
+@keyframes gnGlow{from{filter:drop-shadow(0 0 8px rgba(255,31,110,.4))}to{filter:drop-shadow(0 0 24px rgba(255,107,0,.7))}}
+.bib-info{margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left}
+.bib-field label{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);display:block;margin-bottom:2px}
+.bib-field span{font-size:.9rem;font-weight:600;color:#fff}
+.bib-mod{background:var(--grad);color:#fff;padding:4px 14px;border-radius:50px;font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;display:inline-block;margin-top:14px}
+/* QR */
+.qr-wrap{margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;gap:10px}
+.qr-label{font-size:.66rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+#qrCanvas{border-radius:10px;background:#fff;padding:6px}
+.verified-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,80,.12);border:1px solid rgba(0,200,80,.3);padding:6px 14px;border-radius:50px;font-size:.74rem;font-weight:700;color:#00c850;letter-spacing:.5px}
+/* action buttons */
+.suc-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.btn-print{background:var(--grad);color:#fff;padding:13px 30px;border-radius:50px;font-family:'Montserrat',sans-serif;font-weight:900;font-size:.88rem;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;transition:transform .3s,box-shadow .3s}
+.btn-print:hover{transform:scale(1.05);box-shadow:0 8px 36px rgba(255,31,110,.5)}
+.btn-home{background:transparent;color:#fff;padding:13px 30px;border-radius:50px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:1.5px;text-transform:uppercase;border:1.5px solid rgba(255,255,255,.25);cursor:pointer;text-decoration:none;display:inline-block;transition:border-color .3s}
+.btn-home:hover{border-color:var(--pink)}
+/* PRINT STYLES */
+@media print{
+  body{background:#fff!important;color:#000!important}
+  nav,.bg,.ftag,.particle,#formPage,.suc-actions{display:none!important}
+  #successPage{display:block!important;opacity:1!important}
+  .bib-card{border:2px solid #FF1F6E!important;background:#fff!important;break-inside:avoid}
+  .bib-number{-webkit-text-fill-color:#FF1F6E!important}
+  .bib-field span{color:#000!important}
+  .bib-label,.qr-label{color:#555!important}
+  .verified-badge{background:#e8fff0!important;color:#00a844!important;border-color:#00a844!important}
+  .suc-title,.suc-sub,.pg-eyebrow{display:block!important}
+  .success-wrap{padding:20px}
+  #qrCanvas{display:block!important}
+}
+@media(max-width:600px){
+  .mod-sel{grid-template-columns:1fr}
+  .frow{grid-template-columns:1fr}
+  .form-box{padding:28px 20px}
+  .bib-info{grid-template-columns:1fr}
+  nav{padding:14px 20px}
+}
+</style>
+</head>
+<body>
+<div class="bg"><div class="bg-grid"></div><div class="orb o1"></div><div class="orb o2"></div></div>
+<div id="pc"></div>
+<!-- floating tags -->
+<div class="ftag fp" style="top:20%;left:2%;--rot:-5deg;animation-duration:4.5s">Esporte</div>
+<div class="ftag fo" style="top:15%;right:3%;--rot:6deg;animation-duration:5s;animation-delay:.7s">Força</div>
+<div class="ftag fw" style="bottom:25%;left:2%;--rot:-4deg;animation-duration:6s;animation-delay:1.5s">Juntas</div>
+<div class="ftag fp" style="bottom:20%;right:3%;--rot:5deg;animation-duration:4s;animation-delay:.3s">Voz</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">CORRIDA MULHER</a>
+  <a href="index.html" class="nav-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Voltar ao site
+  </a>
+</nav>
+
+<div class="wrap">
+  <!-- STEPS -->
+  <div class="steps" id="stepsEl">
+    <div class="step active" id="s1"><div class="step-num">1</div><span>Modalidade</span></div>
+    <div class="step-line"></div>
+    <div class="step" id="s2"><div class="step-num">2</div><span>Dados</span></div>
+    <div class="step-line"></div>
+    <div class="step" id="s3"><div class="step-num">3</div><span>Confirmação</span></div>
+  </div>
+
+  <!-- FORM PAGE -->
+  <div id="formPage">
+    <div class="pg-head">
+      <span class="pg-eyebrow">Inscrição Oficial 2026</span>
+      <h1 class="pg-title">Faça parte do <em>movimento</em></h1>
+      <p class="pg-sub">Preencha seus dados e garanta sua vaga nesta corrida histórica</p>
+    </div>
+
+    <!-- MOD SELECTOR -->
+    <div class="mod-sel" id="modSel">
+      <div class="mod-opt" data-mod="Caminhada 3km" onclick="selectMod(this)">
+        <div class="mod-km">3</div>
+        <div class="mod-nm">🚶‍♀️ Caminhada</div>
+      </div>
+      <div class="mod-opt" data-mod="Corrida 5km" onclick="selectMod(this)">
+        <div class="mod-km">5</div>
+        <div class="mod-nm">🏃‍♀️ Corrida</div>
+      </div>
+      <div class="mod-opt" data-mod="Corrida 10km" onclick="selectMod(this)">
+        <div class="mod-km">10</div>
+        <div class="mod-nm">🏅 Corrida Elite</div>
+      </div>
+    </div>
+    <p id="modErr" class="err-msg" style="display:none;margin-bottom:16px;font-size:.82rem;color:#ff4444">⚠ Selecione uma modalidade para continuar.</p>
+
+    <div class="form-box">
+      <div class="form-section-label">Dados Pessoais</div>
+      <div class="frow">
+        <div class="fg"><label>Nome completo *</label><input type="text" id="f-nome" placeholder="Seu nome completo"><p class="err-msg" id="e-nome">Campo obrigatório</p></div>
+        <div class="fg"><label>CPF *</label><input type="text" id="f-cpf" placeholder="000.000.000-00" maxlength="14"><p class="err-msg" id="e-cpf">CPF inválido</p></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Data de nascimento *</label><input type="date" id="f-nasc"><p class="err-msg" id="e-nasc">Campo obrigatório</p></div>
+        <div class="fg"><label>Sexo *</label><select id="f-sexo"><option value="">Selecione</option><option>Feminino</option><option>Masculino</option><option>Prefiro não informar</option></select><p class="err-msg" id="e-sexo">Campo obrigatório</p></div>
+      </div>
+      <div class="frow full">
+        <div class="fg"><label>Nome social (opcional)</label><input type="text" id="f-social" placeholder="Como gostaria de ser chamada"></div>
+      </div>
+
+      <div class="form-div"></div>
+      <div class="form-section-label">Contato</div>
+      <div class="frow">
+        <div class="fg"><label>E-mail *</label><input type="email" id="f-email" placeholder="seu@email.com"><p class="err-msg" id="e-email">E-mail inválido</p></div>
+        <div class="fg"><label>Telefone / WhatsApp *</label><input type="tel" id="f-tel" placeholder="(61) 90000-0000" maxlength="15"><p class="err-msg" id="e-tel">Campo obrigatório</p></div>
+      </div>
+      <div class="frow full">
+        <div class="fg"><label>Cidade / Estado *</label><input type="text" id="f-cidade" placeholder="Ex: Brasília / DF"><p class="err-msg" id="e-cidade">Campo obrigatório</p></div>
+      </div>
+
+      <div class="form-div"></div>
+      <div class="form-section-label">Evento</div>
+      <div class="frow">
+        <div class="fg"><label>Tamanho da camiseta *</label><select id="f-camiseta"><option value="">Selecione</option><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select><p class="err-msg" id="e-camiseta">Campo obrigatório</p></div>
+        <div class="fg"><label>Você tem alguma condição médica?</label><input type="text" id="f-med" placeholder="Ex: hipertensão, asma (opcional)"></div>
+      </div>
+      <div class="frow full">
+        <div class="fg"><label>Contato de emergência *</label><input type="text" id="f-emerg" placeholder="Nome completo e telefone"><p class="err-msg" id="e-emerg">Campo obrigatório</p></div>
+      </div>
+
+      <div class="form-div"></div>
+      <div class="checkbox-wrap">
+        <input type="checkbox" id="f-termos">
+        <label for="f-termos">Declaro que li e aceito os termos de participação do evento, estou em boas condições de saúde para participar e autorizo o uso de imagem para fins de divulgação da Corrida Mulher, Não Se Cale! *</label>
+      </div>
+      <p class="err-msg" id="e-termos">Você precisa aceitar os termos para continuar</p>
+
+      <button class="submit-btn" onclick="submitForm()">CONFIRMAR INSCRIÇÃO →</button>
+      <p class="form-note">* Campos obrigatórios. Seus dados são protegidos e utilizados apenas para fins do evento.</p>
+    </div>
+  </div>
+
+  <!-- SUCCESS PAGE -->
+  <div id="successPage">
+    <div class="success-wrap">
+      <div class="suc-icon">🎉</div>
+      <h2 class="suc-title">Inscrição confirmada!</h2>
+      <p class="suc-sub">Você é oficialmente parte da Corrida Mulher, Não Se Cale! 2026.<br>Guarde seu comprovante abaixo.</p>
+
+      <div class="bib-card" id="bibCard">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+          <div style="text-align:left">
+            <div class="bib-label">Número do Corredor</div>
+            <div class="bib-number" id="bibNum">0001</div>
+            <div class="bib-mod" id="bibMod">Corrida 5km</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:.75rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px">CORRIDA MULHER</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.4);margin-top:2px">NÃO SE CALE! • 2026</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.35);margin-top:2px">Inside Brasil • Brasília/DF</div>
+          </div>
+        </div>
+        <div class="bib-info">
+          <div class="bib-field"><label>Nome</label><span id="bName">—</span></div>
+          <div class="bib-field"><label>CPF</label><span id="bCpf">—</span></div>
+          <div class="bib-field"><label>E-mail</label><span id="bEmail">—</span></div>
+          <div class="bib-field"><label>Telefone</label><span id="bTel">—</span></div>
+          <div class="bib-field"><label>Nascimento</label><span id="bNasc">—</span></div>
+          <div class="bib-field"><label>Camiseta</label><span id="bCam">—</span></div>
+        </div>
+        <div class="bib-field" style="margin-top:12px"><label>Data da inscrição</label><span id="bData">—</span></div>
+        <div class="qr-wrap">
+          <div class="qr-label">QR Code de autenticação</div>
+          <canvas id="qrCanvas" width="120" height="120"></canvas>
+          <div class="verified-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Inscrição verificada — Inside Brasil 2026
+          </div>
+          <div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:6px" id="bId">ID: —</div>
+        </div>
+      </div>
+
+      <div class="suc-actions">
+        <button class="btn-print" onclick="window.print()">
+          🖨 Imprimir Comprovante
+        </button>
+        <a href="index.html" class="btn-home">← Voltar ao site</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// particles
+const pc=document.getElementById('pc');
+pc.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:0';
+for(let i=0;i<20;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;background:${Math.random()>.5?'#FF1F6E':'#FF6B00'};animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*10}s`;pc.appendChild(p)}
+
+// pre-select from URL
+(function(){
+  const p=new URLSearchParams(location.search).get('mod')||'';
+  const map={'caminhada-3km':'Caminhada 3km','corrida-5km':'Corrida 5km','corrida-10km':'Corrida 10km'};
+  const target=map[p];
+  if(target){
+    document.querySelectorAll('.mod-opt').forEach(opt=>{if(opt.dataset.mod===target){opt.classList.add('selected');updateStep2()}});
+  }
+})();
+
+function selectMod(el){
+  document.querySelectorAll('.mod-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('modErr').style.display='none';
+  updateStep2();
+}
+function updateStep2(){
+  document.getElementById('s1').classList.remove('active');
+  document.getElementById('s1').classList.add('done');
+  document.getElementById('s1').querySelector('.step-num').textContent='✓';
+  document.getElementById('s2').classList.add('active');
+}
+
+// CPF mask
+document.getElementById('f-cpf').addEventListener('input',function(){
+  let v=this.value.replace(/\D/g,'').slice(0,11);
+  v=v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})\.(\d{3})(\d)/,'$1.$2.$3').replace(/\.(\d{3})(\d)/,'.$1-$2');
+  this.value=v;
+});
+// Tel mask
+document.getElementById('f-tel').addEventListener('input',function(){
+  let v=this.value.replace(/\D/g,'').slice(0,11);
+  v=v.replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');
+  this.value=v;
+});
+
+function validCPF(c){const d=c.replace(/\D/g,'');return d.length===11}
+
+function showErr(id,msg,show){
+  const el=document.getElementById('e-'+id);
+  if(el){el.style.display=show?'block':'none';if(msg)el.textContent=msg}
+  const inp=document.getElementById('f-'+id);
+  if(inp)inp.style.borderColor=show?'#ff4444':'';
+}
+
+function submitForm(){
+  const sel=document.querySelector('.mod-opt.selected');
+  if(!sel){document.getElementById('modErr').style.display='block';window.scrollTo(0,0);return}
+
+  const nome=document.getElementById('f-nome').value.trim();
+  const cpf=document.getElementById('f-cpf').value.trim();
+  const nasc=document.getElementById('f-nasc').value;
+  const sexo=document.getElementById('f-sexo').value;
+  const email=document.getElementById('f-email').value.trim();
+  const tel=document.getElementById('f-tel').value.trim();
+  const cidade=document.getElementById('f-cidade').value.trim();
+  const camiseta=document.getElementById('f-camiseta').value;
+  const emerg=document.getElementById('f-emerg').value.trim();
+  const termos=document.getElementById('f-termos').checked;
+
+  let ok=true;
+  if(!nome){showErr('nome','Campo obrigatório',true);ok=false}else showErr('nome','',false);
+  if(!validCPF(cpf)){showErr('cpf','CPF inválido',true);ok=false}else showErr('cpf','',false);
+  if(!nasc){showErr('nasc','Campo obrigatório',true);ok=false}else showErr('nasc','',false);
+  if(!sexo){showErr('sexo','Campo obrigatório',true);ok=false}else showErr('sexo','',false);
+  if(!email||!email.includes('@')){showErr('email','E-mail inválido',true);ok=false}else showErr('email','',false);
+  if(!tel){showErr('tel','Campo obrigatório',true);ok=false}else showErr('tel','',false);
+  if(!cidade){showErr('cidade','Campo obrigatório',true);ok=false}else showErr('cidade','',false);
+  if(!camiseta){showErr('camiseta','Campo obrigatório',true);ok=false}else showErr('camiseta','',false);
+  if(!emerg){showErr('emerg','Campo obrigatório',true);ok=false}else showErr('emerg','',false);
+  if(!termos){document.getElementById('e-termos').style.display='block';ok=false}else document.getElementById('e-termos').style.display='none';
+  if(!ok){document.querySelector('.err-msg[style*="block"]')?.scrollIntoView({behavior:'smooth',block:'center'});return}
+
+  // generate runner number
+  let inscricoes=JSON.parse(localStorage.getItem('inscricoes')||'[]');
+  // Carrega do Firebase se disponível
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const fbApp2 = initializeApp(window._FB_CONFIG || {}, 'inscricao');
+    const db2 = getFirestore(fbApp2);
+    const snap = await getDoc(doc(db2,'site','inscricoes'));
+    if(snap.exists()) inscricoes = snap.data().list || [];
+  } catch(e) { /* usa localStorage */ }
+  const num=String(inscricoes.length+1).padStart(4,'0');
+  const id='CM2026-'+num+'-'+Date.now().toString(36).toUpperCase();
+  const mod=sel.dataset.mod;
+  const nascFmt=nasc?new Date(nasc+'T00:00:00').toLocaleDateString('pt-BR'):'';
+  const now=new Date().toLocaleString('pt-BR');
+
+  const entry={id,numero:num,nome,cpf,nasc:nascFmt,sexo,social:document.getElementById('f-social').value.trim(),email,tel,cidade,camiseta,emergencia:emerg,medicamentos:document.getElementById('f-med').value.trim(),modalidade:mod,data:now,status:'novo'};
+  inscricoes.push(entry);
+  localStorage.setItem('inscricoes',JSON.stringify(inscricoes));
+  // Salva no Firebase
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const fbApp2 = initializeApp(window._FB_CONFIG || {}, 'inscricao');
+    const db2 = getFirestore(fbApp2);
+    await setDoc(doc(db2,'site','inscricoes'), {list: inscricoes});
+  } catch(e) { console.warn('Firebase inscricao save error:', e); }
+
+  // show success
+  document.getElementById('formPage').style.display='none';
+  document.getElementById('stepsEl').querySelectorAll('.step').forEach(s=>{s.classList.remove('active');s.classList.add('done');s.querySelector('.step-num').textContent='✓'});
+  document.getElementById('s3').classList.add('active');
+  document.getElementById('successPage').style.display='block';
+
+  // populate bib
+  document.getElementById('bibNum').textContent='#'+num;
+  document.getElementById('bibMod').textContent=mod;
+  document.getElementById('bName').textContent=nome;
+  document.getElementById('bCpf').textContent=cpf;
+  document.getElementById('bEmail').textContent=email;
+  document.getElementById('bTel').textContent=tel;
+  document.getElementById('bNasc').textContent=nascFmt;
+  document.getElementById('bCam').textContent='Camiseta '+camiseta;
+  document.getElementById('bData').textContent=now;
+  document.getElementById('bId').textContent='ID: '+id;
+
+  // QR code
+  drawQR(id,nome,num,mod);
+  window.scrollTo(0,0);
+}
+
+// Simple QR code generator (matrix-based)
+function drawQR(id,nome,num,mod){
+  const canvas=document.getElementById('qrCanvas');
+  const ctx=canvas.getContext('2d');
+  const data=`CORRIDA-MULHER-2026|ID:${id}|NUM:#${num}|ATLETA:${nome}|MOD:${mod}|VERIFICADO:Inside-Brasil`;
+  const size=canvas.width;
+  const cells=25;
+  const cell=size/cells;
+  ctx.fillStyle='#fff';
+  ctx.fillRect(0,0,size,size);
+  ctx.fillStyle='#111';
+  // deterministic pattern from string hash
+  let hash=0;for(let i=0;i<data.length;i++)hash=(hash<<5)-hash+data.charCodeAt(i)|0;
+  const rand=s=>{s=Math.sin(s+hash)*10000;return s-Math.floor(s)};
+  // position detection patterns
+  function drawFinder(x,y){
+    ctx.fillStyle='#111';ctx.fillRect(x*cell,y*cell,7*cell,7*cell);
+    ctx.fillStyle='#fff';ctx.fillRect((x+1)*cell,(y+1)*cell,5*cell,5*cell);
+    ctx.fillStyle='#111';ctx.fillRect((x+2)*cell,(y+2)*cell,3*cell,3*cell);
+  }
+  drawFinder(0,0);drawFinder(cells-7,0);drawFinder(0,cells-7);
+  // data modules
+  for(let r=0;r<cells;r++){for(let c=0;c<cells;c++){
+    // skip finder pattern zones
+    if((r<8&&c<8)||(r<8&&c>cells-9)||(r>cells-9&&c<8))continue;
+    if(rand(r*cells+c)>.45){ctx.fillStyle='#111';ctx.fillRect(c*cell,r*cell,cell,cell)}
+  }}
+  // gradient overlay for the pink-orange brand
+  const grd=ctx.createLinearGradient(0,0,size,size);
+  grd.addColorStop(0,'rgba(255,31,110,.08)');grd.addColorStop(1,'rgba(255,107,0,.08)');
+  ctx.fillStyle=grd;ctx.fillRect(0,0,size,size);
+}
+</script>
+
+<script>
+// ══════════════════════════════════════════════
+// FIREBASE CONFIG — substitua pelos seus dados
+// ══════════════════════════════════════════════
+window._FB_CONFIG = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_PROJETO.firebaseapp.com",
+  projectId: "SEU_PROJETO_ID",
+  storageBucket: "SEU_PROJETO.appspot.com",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID"
+};
+</script>
+</body>
+</html>
