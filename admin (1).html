@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel ADM — Corrida Mulher</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--pk:#FF1F6E;--or:#FF6B00;--bk:#080808;--dk:#0f080f;--pn:#120a12;--cd:rgba(255,255,255,.04);--bd:rgba(255,255,255,.08);--g:linear-gradient(135deg,#FF1F6E,#FF6B00);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bk);color:#fff;display:flex;height:100vh;overflow:hidden;}
+/* SIDEBAR */
+.sb{width:238px;background:var(--pn);border-right:1px solid rgba(255,31,110,.12);display:flex;flex-direction:column;flex-shrink:0;}
+.sbb{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,.05);}
+.sbl{font-family:'Montserrat',sans-serif;font-weight:900;font-size:.82rem;background:var(--g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.3;}
+.sbs{font-size:.6rem;color:rgba(255,255,255,.28);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;}
+.sbn{flex:1;padding:14px 10px;overflow-y:auto;}
+.sbs2{font-size:.58rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.25);font-weight:700;padding:8px 12px 5px;margin-top:10px;}
+.si{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;transition:background .2s,color .2s;color:rgba(255,255,255,.52);font-size:.86rem;font-weight:500;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;font-family:'DM Sans',sans-serif;}
+.si svg{width:17px;height:17px;flex-shrink:0;}
+.si:hover{background:rgba(255,255,255,.055);color:#fff;}
+.si.ac{background:rgba(255,31,110,.14);color:#fff;border-left:3px solid var(--pk);padding-left:9px;}
+.sbf{padding:14px 18px;border-top:1px solid rgba(255,255,255,.05);}
+.sbx{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.38);font-size:.8rem;cursor:pointer;text-decoration:none;transition:color .3s;}
+.sbx:hover{color:var(--pk);}
+.sbx svg{width:15px;height:15px;}
+/* MAIN */
+.mn{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.tb{background:var(--pn);border-bottom:1px solid rgba(255,255,255,.055);padding:14px 30px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.tbt{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.05rem;}
+.tba{display:flex;gap:8px;}
+.ct{overflow-y:auto;padding:28px 30px;flex:1;}
+/* PAGES */
+.pg{display:none;}.pg.ac{display:block;}
+/* STAT CARDS */
+.scr{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.sc{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:22px;position:relative;overflow:hidden;}
+.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--g);}
+.scl{font-size:.67rem;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.36);margin-bottom:7px;}
+.scv{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.85rem;background:var(--g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.scs{font-size:.72rem;color:rgba(255,255,255,.28);margin-top:3px;}
+/* TABLE */
+.tw{background:var(--cd);border:1px solid var(--bd);border-radius:14px;overflow:hidden;}
+.tth{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--bd);flex-wrap:wrap;gap:8px;}
+.tth h3{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.87rem;}
+.ta{display:flex;gap:7px;flex-wrap:wrap;}
+.si2{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 13px;color:#fff;font-size:.8rem;outline:none;width:190px;transition:border-color .3s;font-family:'DM Sans',sans-serif;}
+.si2:focus{border-color:var(--pk);}
+.si2::placeholder{color:rgba(255,255,255,.28);}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:10px 14px;font-size:.64rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.32);background:rgba(255,255,255,.02);border-bottom:1px solid var(--bd);font-weight:700;}
+td{padding:12px 14px;font-size:.84rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,31,110,.04);}
+.bgg{display:inline-block;padding:3px 9px;border-radius:50px;font-size:.64rem;font-weight:700;}
+.bn{background:rgba(255,31,110,.18);color:#ff6fa0;}
+.bl{background:rgba(255,107,0,.18);color:#ffaa55;}
+.bo{background:rgba(0,200,80,.14);color:#00d060;}
+.ta2{display:flex;gap:4px;}
+.tb2{background:rgba(255,255,255,.06);border:none;color:rgba(255,255,255,.6);padding:4px 10px;border-radius:6px;font-size:.7rem;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.tb2:hover{background:rgba(255,31,110,.28);color:#fff;}
+.tb2.dl:hover{background:rgba(255,60,60,.28);}
+.es{text-align:center;padding:56px 20px;color:rgba(255,255,255,.22);}
+.es svg{width:44px;height:44px;margin-bottom:10px;opacity:.25;}
+/* BTNS */
+.bt{display:inline-flex;align-items:center;gap:5px;background:var(--g);color:#fff;border:none;padding:8px 18px;border-radius:7px;font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:transform .2s;font-family:'DM Sans',sans-serif;}
+.bt:hover{transform:scale(1.03);}
+.bt.out{background:transparent;border:1px solid rgba(255,255,255,.13);color:rgba(255,255,255,.62);}
+.bt.out:hover{border-color:var(--pk);color:#fff;transform:none;}
+.bt svg{width:14px;height:14px;}
+/* EDITOR */
+.eg{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.ec{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:18px;}
+.ec label{display:block;font-size:.64px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:7px;font-size:.64rem;}
+.ei,.eta{width:100%;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:10px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;transition:border-color .3s;}
+.ei:focus,.eta:focus{border-color:var(--pk);}
+.eta{resize:vertical;min-height:76px;}
+.sv{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--bd);}
+.sm{font-size:.78rem;color:rgba(255,255,255,.36);}
+/* LOGOS */
+.lgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+.lc{background:var(--cd);border:1px solid var(--bd);border-radius:12px;overflow:hidden;}
+.lp{width:100%;height:120px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(255,31,110,.06),rgba(255,107,0,.04));position:relative;}
+.lp img{max-width:140px;max-height:80px;object-fit:contain;}
+.li{padding:12px;}
+.li p{font-size:.8rem;color:rgba(255,255,255,.48);margin-bottom:9px;}
+.lil{display:block;text-align:center;background:var(--g);color:#fff;padding:7px;border-radius:7px;font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:transform .2s;}
+.lil:hover{transform:scale(1.02);}
+.lif{display:none;}
+/* IMAGES / GALLERY */
+.imgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.ic2{background:var(--cd);border:1px solid var(--bd);border-radius:12px;overflow:hidden;}
+.ip{width:100%;height:150px;object-fit:cover;background:linear-gradient(135deg,rgba(255,31,110,.07),rgba(255,107,0,.05));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:rgba(255,255,255,.14);font-size:.66rem;letter-spacing:1.5px;text-transform:uppercase;}
+.ip svg{width:28px;height:28px;opacity:.22;}
+.ii{padding:12px;}
+.ii p{font-size:.8rem;color:rgba(255,255,255,.45);margin-bottom:8px;}
+/* GALLERY ADM */
+.galadm{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.gi{position:relative;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid var(--bd);}
+.gi img{width:100%;height:140px;object-fit:cover;display:block;}
+.gi-over{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity .3s;}
+.gi:hover .gi-over{opacity:1;}
+.gi-btn{background:rgba(255,255,255,.12);border:none;color:#fff;width:30px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.gi-btn:hover{background:rgba(255,31,110,.5);}
+.gi-btn.dl:hover{background:rgba(255,60,60,.5);}
+.gi-btn svg{width:14px;height:14px;}
+.gal-add{border:1.5px dashed rgba(255,255,255,.14);border-radius:10px;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:border-color .3s;}
+.gal-add:hover{border-color:var(--pk);}
+.gal-add svg{width:26px;height:26px;color:rgba(255,255,255,.22);}
+.gal-add span{font-size:.66rem;color:rgba(255,255,255,.25);letter-spacing:1.5px;text-transform:uppercase;}
+/* PARCEIROS */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+.pc{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;}
+.pcpv{width:100%;height:56px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:rgba(255,255,255,.04);}
+.pcpv img{max-width:110px;max-height:44px;object-fit:contain;}
+.pcr{position:absolute;top:7px;right:7px;background:rgba(255,60,60,.18);border:none;color:#ff6666;width:20px;height:20px;border-radius:50%;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.pcr:hover{background:rgba(255,60,60,.38);}
+.pa{border:1.5px dashed rgba(255,255,255,.13);border-radius:12px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:border-color .3s;min-height:110px;justify-content:center;}
+.pa:hover{border-color:var(--pk);}
+.pa svg{width:26px;height:26px;color:rgba(255,255,255,.22);}
+.pa span{font-size:.64rem;color:rgba(255,255,255,.24);letter-spacing:1.5px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sbb"><div class="sbl">CORRIDA<br>MULHER</div><div class="sbs">Painel ADM</div></div>
+  <nav class="sbn">
+    <div class="sbs2">Principal</div>
+    <button class="si ac" onclick="goto('dashboard',this)"><svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6.5" height="6.5" rx="1.5"/><rect x="9.5" y="1" width="6.5" height="6.5" rx="1.5"/><rect x="1" y="9.5" width="6.5" height="6.5" rx="1.5"/><rect x="9.5" y="9.5" width="6.5" height="6.5" rx="1.5"/></svg>Dashboard</button>
+    <button class="si" onclick="goto('inscricoes',this)"><svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 5h12M2.5 8.5h12M2.5 12h7"/></svg>Inscrições</button>
+    <div class="sbs2">Identidade Visual</div>
+    <button class="si" onclick="goto('logos',this)"><svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="4" width="14" height="9" rx="2"/><circle cx="6" cy="8.5" r="1.5"/><path d="M1.5 12l4-4 3 3 3-3 4 4"/></svg>Logos, Favicon &amp; Kit</button>
+    <button class="si" onclick="goto('atleta',this)"><svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8.5 2a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM3 15c0-2.76 2.46-5 5.5-5s5.5 2.24 5.5 5"/></svg>Imagem Atleta (Hero)</button>
+    <div class="sbs2">Conteúdo</div>
+    <button class="si" onclick="goto('textos',this)"><svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4h12M2.5 7.5h8M2.5 11h10M12 9.5l2 2-2 2M10.5 11.5h4"/></svg>Textos</button>
+    <button class="si" onclick="goto('galeria',this)"><svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="3" width="14" height="11" rx="2"/><circle cx="6" cy="8" r="1.5"/><path d="M1.5 12l4-4 3 3 2-2 5 4"/></svg>Galeria de Fotos</button>
+    <button class="si" onclick="goto('parceiros',this)"><svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="7" r="2.5"/><circle cx="11.5" cy="7" r="2.5"/><path d="M1 14c0-2.2 2.02-4 4.5-4M11.5 10c2.48 0 4.5 1.8 4.5 4"/><path d="M7.5 10c0 1.5-1 3.5-2 4.5M7.5 10c0 1.5 1 3.5 2 4.5"/></svg>Parceiros</button>
+    <button class="si" onclick="goto('instagram',this)"><svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="14" height="14" rx="4"/><circle cx="8.5" cy="8.5" r="3"/><circle cx="12.5" cy="4.5" r=".8" fill="currentColor" stroke="none"/></svg>Instagram</button>
+  </nav>
+  <div class="sbf"><a href="index.html" class="sbx"><svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3L5 7.5 9 12"/></svg>Voltar ao site</a></div>
+</aside>
+
+<!-- MAIN -->
+<div class="mn">
+  <div class="tb">
+    <div class="tbt" id="tbTitle">Dashboard</div>
+    <div class="tba">
+      <a href="inscricao.html" target="_blank" class="bt out"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V9M9 1h4v4M6 8L13 1"/></svg>Formulário</a>
+      <a href="index.html" target="_blank" class="bt out"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V9M9 1h4v4M6 8L13 1"/></svg>Ver site</a>
+    </div>
+  </div>
+  <div class="ct">
+
+    <!-- DASHBOARD -->
+    <div class="pg ac" id="pg-dashboard">
+      <div class="scr" id="statCards"></div>
+      <div class="tw"><div class="tth"><h3>Últimas inscrições</h3><button class="bt out" onclick="goto('inscricoes',null)">Ver todas</button></div><div id="recentTbl"></div></div>
+    </div>
+
+    <!-- INSCRIÇÕES -->
+    <div class="pg" id="pg-inscricoes">
+      <div class="tw">
+        <div class="tth">
+          <h3>Todas as inscrições</h3>
+          <div class="ta">
+            <input class="si2" type="text" placeholder="Buscar nome..." id="srcInp" oninput="renderFull()">
+            <button class="bt out" onclick="exportCSV()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v8M4.5 6.5L7 9l2.5-2.5M1.5 10.5v1.5a1 1 0 001 1h9a1 1 0 001-1v-1.5"/></svg>CSV</button>
+            <button class="bt out" onclick="exportPDF()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v8M4.5 6.5L7 9l2.5-2.5M1.5 10.5v1.5a1 1 0 001 1h9a1 1 0 001-1v-1.5"/></svg>PDF</button>
+            <button class="bt" onclick="clearAll()" style="background:rgba(255,60,60,.25);"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 4h11M4.5 4V2.5h5V4M5.5 6.5v4M8.5 6.5v4M2.5 4l1 8a1 1 0 001 1h7a1 1 0 001-1l1-8"/></svg>Limpar</button>
+          </div>
+        </div>
+        <div id="fullTbl"></div>
+      </div>
+    </div>
+
+    <!-- LOGOS & FAVICON -->
+    <div class="pg" id="pg-logos">
+      <div class="lgrid" id="logoGrid"></div>
+      <div class="sv"><span class="sm" id="logoMsg"></span><button class="bt" onclick="saveLogo()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 1.5h8l3 3v8a1 1 0 01-1 1h-10a1 1 0 01-1-1v-10a1 1 0 011-1z"/><path d="M4.5 13.5v-5h5v5M4.5 1.5v2.5h6"/></svg>Salvar logos</button></div>
+    </div>
+
+    <!-- ATLETA HERO -->
+    <div class="pg" id="pg-atleta">
+      <div style="max-width:480px;">
+        <p style="color:rgba(255,255,255,.5);font-size:.9rem;line-height:1.7;margin-bottom:22px;">Faça upload de uma imagem <strong>PNG com fundo transparente</strong> da atleta. Ela aparecerá no lado direito do hero, sobreposta ao fundo animado.</p>
+        <div class="ic2">
+          <div class="ip" id="athPreview" style="height:280px;"><svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="5" width="32" height="24" rx="4"/><circle cx="12" cy="14" r="3"/><path d="M2 22l8-7 6 6 5-5 13 10"/></svg><span>Sem imagem</span></div>
+          <div class="ii"><p>Imagem da atleta (PNG sem fundo)</p><label class="lil" for="athFile">📁 Escolher PNG</label><input class="lif" type="file" id="athFile" accept="image/png,image/*" onchange="previewAth(this)"></div>
+        </div>
+        <div class="sv"><span class="sm" id="athMsg"></span><button class="bt" onclick="saveAth()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 1.5h8l3 3v8a1 1 0 01-1 1h-10a1 1 0 01-1-1v-10a1 1 0 011-1z"/><path d="M4.5 13.5v-5h5v5M4.5 1.5v2.5h6"/></svg>Salvar imagem</button></div>
+      </div>
+    </div>
+
+    <!-- TEXTOS -->
+    <div class="pg" id="pg-textos">
+      <div class="eg" id="edGrid"></div>
+      <div class="sv"><span class="sm" id="txMsg"></span><button class="bt" onclick="saveTexts()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 1.5h8l3 3v8a1 1 0 01-1 1h-10a1 1 0 01-1-1v-10a1 1 0 011-1z"/><path d="M4.5 13.5v-5h5v5M4.5 1.5v2.5h6"/></svg>Salvar textos</button></div>
+    </div>
+
+    <!-- GALERIA -->
+    <div class="pg" id="pg-galeria">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h3 style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:3px;">Galeria de Fotos</h3>
+          <p style="font-size:.8rem;color:rgba(255,255,255,.38);">Adicione quantas fotos quiser. Clique nos botões para baixar ou remover.</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="bt out" onclick="downloadAll()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v8M4.5 6.5L7 9l2.5-2.5M1.5 10.5v1.5a1 1 0 001 1h9a1 1 0 001-1v-1.5"/></svg>Baixar todas</button>
+          <button class="bt" onclick="saveGal()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 1.5h8l3 3v8a1 1 0 01-1 1h-10a1 1 0 01-1-1v-10a1 1 0 011-1z"/><path d="M4.5 13.5v-5h5v5M4.5 1.5v2.5h6"/></svg>Salvar galeria</button>
+        </div>
+      </div>
+      <div class="galadm" id="galAdm"></div>
+      <label class="gal-add" for="galFile"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="13" cy="13" r="11"/><path d="M13 8v10M8 13h10"/></svg><span>Adicionar fotos</span></label>
+      <input type="file" id="galFile" accept="image/*" multiple style="display:none" onchange="addGalImgs(this)">
+      <div style="margin-top:10px;"><span class="sm" id="galMsg"></span></div>
+    </div>
+
+    <!-- PARCEIROS -->
+    <div class="pg" id="pg-parceiros">
+      <div style="margin-bottom:18px;"><h3 style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:3px;">Logos dos Parceiros</h3><p style="font-size:.8rem;color:rgba(255,255,255,.38);">Adicione as logos que aparecerão na seção de parceiros do site.</p></div>
+      <div class="pgrid" id="parcGrid"></div>
+      <label class="pa" for="parcFile"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="13" cy="13" r="11"/><path d="M13 8v10M8 13h10"/></svg><span>Adicionar parceiro</span></label>
+      <input type="file" id="parcFile" accept="image/*" style="display:none" onchange="addParc(this)">
+      <div class="sv"><span class="sm" id="parcMsg"></span><button class="bt" onclick="saveParc()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 1.5h8l3 3v8a1 1 0 01-1 1h-10a1 1 0 01-1-1v-10a1 1 0 011-1z"/><path d="M4.5 13.5v-5h5v5M4.5 1.5v2.5h6"/></svg>Salvar parceiros</button></div>
+    </div>
+
+    <!-- INSTAGRAM -->
+    <div class="pg" id="pg-instagram">
+      <div class="eg" id="igEdGrid"></div>
+      <div class="sv"><span class="sm" id="igMsg"></span><button class="bt" onclick="saveIG()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 1.5h8l3 3v8a1 1 0 01-1 1h-10a1 1 0 01-1-1v-10a1 1 0 011-1z"/><path d="M4.5 13.5v-5h5v5M4.5 1.5v2.5h6"/></svg>Salvar</button></div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+// FIREBASE IMPORTS (devem vir primeiro)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const FB_CONFIG = {
+  apiKey: "AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",
+  authDomain: "corrida-mulher.firebaseapp.com",
+  projectId: "corrida-mulher",
+  storageBucket: "corrida-mulher.firebasestorage.app",
+  messagingSenderId: "545833671209",
+  appId: "1:545833671209:web:3cc2e246aa2baf56af1a38"
+};
+const fbApp = initializeApp(FB_CONFIG);
+const db = getFirestore(fbApp);
+
+// STATE
+let inscs=JSON.parse(localStorage.getItem('inscricoes')||'[]');
+let txts=JSON.parse(localStorage.getItem('siteTexts')||'{}');
+let parc=JSON.parse(localStorage.getItem('parceiros')||'[]');
+let igCfg=JSON.parse(localStorage.getItem('igConfig')||'{}');
+let imgData=JSON.parse(localStorage.getItem('imgData')||'{}');
+let gallImgs=JSON.parse(localStorage.getItem('galleryImgs')||'[]');
+
+// Carrega dados do Firebase ao iniciar
+async function loadFromFirebase() {
+  try {
+    const keys = ['inscricoes','siteTexts','parceiros','igConfig','imgData','galleryImgs'];
+    const snaps = await Promise.all(keys.map(k => getDoc(doc(db,'site',k))));
+    snaps.forEach((snap, i) => {
+      if(!snap.exists()) return;
+      const d = snap.data();
+      const val = d.list !== undefined ? d.list : d;
+      localStorage.setItem(keys[i], JSON.stringify(val));
+    });
+    inscs    = JSON.parse(localStorage.getItem('inscricoes')||'[]');
+    txts     = JSON.parse(localStorage.getItem('siteTexts')||'{}');
+    parc     = JSON.parse(localStorage.getItem('parceiros')||'[]');
+    igCfg    = JSON.parse(localStorage.getItem('igConfig')||'{}');
+    imgData  = JSON.parse(localStorage.getItem('imgData')||'{}');
+    gallImgs = JSON.parse(localStorage.getItem('galleryImgs')||'[]');
+    // Re-renderiza a aba atual com dados frescos
+    const active = document.querySelector('.si.active');
+    if(active) active.click();
+  } catch(e) { console.warn('Firebase load error:', e); }
+}
+
+// NAV
+const titles={dashboard:'Dashboard',inscricoes:'Inscrições',logos:'Logos, Favicon & Kit',atleta:'Imagem Atleta (Hero)',textos:'Textos do Site',galeria:'Galeria de Fotos',parceiros:'Parceiros',instagram:'Instagram'};
+function goto(id,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('ac'));
+  document.querySelectorAll('.si').forEach(b=>b.classList.remove('ac'));
+  document.getElementById('pg-'+id).classList.add('ac');
+  document.getElementById('tbTitle').textContent=titles[id]||id;
+  if(el)el.classList.add('ac');
+  const fns={dashboard:renderDash,inscricoes:renderFull,logos:renderLogos,atleta:renderAth,textos:renderTexts,galeria:renderGalAdm,parceiros:renderParc,instagram:renderIG};
+  if(fns[id])fns[id]();
+}
+
+// DASHBOARD
+function renderDash(){
+  inscs=JSON.parse(localStorage.getItem('inscricoes')||'[]');
+  const nv=inscs.filter(r=>r.status==='novo').length;
+  const m3=inscs.filter(r=>r.mod?.includes('3')).length;
+  const m5=inscs.filter(r=>r.mod?.includes('5')).length;
+  const m10=inscs.filter(r=>r.mod?.includes('10')).length;
+  document.getElementById('statCards').innerHTML=`
+    <div class="sc"><div class="scl">Total inscritas</div><div class="scv">${inscs.length}</div><div class="scs">Registros</div></div>
+    <div class="sc"><div class="scl">Novas</div><div class="scv">${nv}</div><div class="scs">Aguardando revisão</div></div>
+    <div class="sc"><div class="scl">Distribuição</div><div class="scv">${m3}·${m5}·${m10}</div><div class="scs">3km · 5km · 10km</div></div>
+    <div class="sc"><div class="scl">Meta</div><div class="scv">${Math.round(inscs.length/2000*100)}%</div><div class="scs">de 2.000 vagas</div></div>`;
+  document.getElementById('recentTbl').innerHTML=inscs.length?tblHTML(inscs.slice(-5).reverse(),false):'<div class="es"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="8" width="40" height="32" rx="3"/><path d="M12 18h24M12 26h16M12 34h10"/></svg><p>Sem inscrições</p></div>';
+}
+
+function tblHTML(data,full){
+  return`<table><thead><tr><th>#</th><th>Nome</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th>${full?'<th>Ações</th>':''}</tr></thead><tbody>${
+    data.map(r=>{const i=inscs.indexOf(r);return`<tr>
+      <td style="font-weight:700;color:rgba(255,255,255,.35);font-size:.76rem">#${r.num||'—'}</td>
+      <td><strong>${r.nome}</strong><br><span style="font-size:.72rem;color:rgba(255,255,255,.32)">${r.email}</span></td>
+      <td>${r.mod}</td><td>${r.cam}</td>
+      <td style="font-size:.74rem;color:rgba(255,255,255,.32)">${r.data}</td>
+      <td><span class="bgg ${r.status==='novo'?'bn':r.status==='lido'?'bl':'bo'}">${{novo:'🔴 Novo',lido:'🟡 Lido',ok:'✅ OK'}[r.status]||r.status}</span></td>
+      ${full?`<td><div class="ta2">
+        <button class="tb2" onclick="chgSt(${i})">Status</button>
+        <button class="tb2 dl" onclick="delRow(${i})">✕</button>
+      </div></td>`:''}
+    </tr>`;}).join('')
+  }</tbody></table>`;
+}
+
+function renderFull(){
+  inscs=JSON.parse(localStorage.getItem('inscricoes')||'[]');
+  const q=(document.getElementById('srcInp')?.value||'').toLowerCase();
+  const fd=q?inscs.filter(r=>r.nome?.toLowerCase().includes(q)||r.email?.toLowerCase().includes(q)):inscs;
+  document.getElementById('fullTbl').innerHTML=fd.length?tblHTML([...fd].reverse(),true):'<div class="es"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="8" width="40" height="32" rx="3"/><path d="M12 18h24M12 26h16M12 34h10"/></svg><p>Nenhuma encontrada</p></div>';
+}
+function chgSt(i){const s=inscs[i].status;inscs[i].status=s==='novo'?'lido':s==='lido'?'ok':'novo';save('inscricoes',inscs);renderFull();}
+function delRow(i){if(!confirm('Excluir?'))return;inscs.splice(i,1);save('inscricoes',inscs);renderFull();renderDash();}
+function clearAll(){if(!confirm('Excluir TODAS as inscrições?'))return;inscs=[];save('inscricoes',inscs);renderFull();renderDash();}
+
+// EXPORT CSV
+function exportCSV(){
+  if(!inscs.length){alert('Sem inscrições.');return;}
+  const h=['#','Nome','CPF','Email','Telefone','Nascimento','Sexo','Endereço','Emergência','Modalidade','Camiseta','Data','Status'];
+  const rows=inscs.map(r=>[r.num,r.nome,r.cpf,r.email,r.tel,r.nasc,r.sexo,r.end,r.emerg,r.mod,r.cam,r.data,r.status]);
+  dl('\uFEFF'+[h,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n'),'inscricoes.csv','text/csv');
+}
+function exportPDF(){
+  if(!inscs.length){alert('Sem inscrições.');return;}
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inscrições</title><style>body{font-family:Arial;padding:20px;color:#000}h1{color:#FF1F6E;font-size:15px;margin-bottom:4px}p{font-size:10px;color:#666;margin-bottom:14px}table{width:100%;border-collapse:collapse;font-size:9.5px}th{background:#FF1F6E;color:#fff;padding:6px 7px;text-align:left}td{padding:5px 7px;border-bottom:1px solid #eee}tr:nth-child(even)td{background:#fff5f8}</style></head><body><h1>Corrida Mulher, Não Se Cale! — Inscrições</h1><p>Gerado em ${new Date().toLocaleString('pt-BR')} · Total: ${inscs.length}</p><table><tr><th>#</th><th>Nome</th><th>CPF</th><th>Email</th><th>Tel</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th></tr>${inscs.map(r=>`<tr><td>${r.num||'—'}</td><td>${r.nome}</td><td>${r.cpf}</td><td>${r.email}</td><td>${r.tel}</td><td>${r.mod}</td><td>${r.cam}</td><td>${r.data}</td><td>${r.status}</td></tr>`).join('')}</table></body></html>`);
+  w.document.close();setTimeout(()=>w.print(),500);
+}
+
+// LOGOS
+const logoSlots=[
+  {key:'logoNav',label:'Logo Navbar (topo)',hint:'Recomendado: PNG ou SVG, altura ~36px'},
+  {key:'logoFooter',label:'Logo Rodapé',hint:'Recomendado: PNG ou SVG, altura ~44px'},
+  {key:'favicon',label:'Favicon (aba do navegador)',hint:'Recomendado: PNG quadrado, 32×32 ou 64×64'},
+  {key:'kit',label:'Imagem do Kit (seção Kit)',hint:'Recomendado: PNG sem fundo, foto do kit completo'},
+];
+function renderLogos(){
+  document.getElementById('logoGrid').innerHTML=logoSlots.map(s=>`
+    <div class="lc">
+      <div class="lp" id="lp-${s.key}">${imgData[s.key]?`<img src="${imgData[s.key]}" alt="">`:
+        `<svg viewBox="0 0 36 36" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1.4"><rect x="2" y="8" width="32" height="20" rx="4"/><path d="M8 20h6M8 24h4"/></svg>`}</div>
+      <div class="li"><p>${s.label}<br><small style="font-size:.68rem;color:rgba(255,255,255,.28);">${s.hint}</small></p>
+      <label class="lil" for="lf-${s.key}">📁 Trocar</label>
+      <input class="lif" type="file" id="lf-${s.key}" accept="image/*" onchange="previewLogo(this,'${s.key}')"></div>
+    </div>`).join('');
+}
+function previewLogo(inp,key){
+  readImg(inp.files[0],d=>{imgData[key]=d;const el=document.getElementById('lp-'+key);el.innerHTML=`<img src="${d}" alt="" style="max-width:140px;max-height:80px;object-fit:contain;">`;});
+}
+function saveLogo(){save('imgData',imgData);flash('logoMsg','✅ Logos salvas!');}
+
+// ATLETA
+let athTmp=null;
+function renderAth(){
+  const p=document.getElementById('athPreview');
+  if(imgData.runner)p.innerHTML=`<img src="${imgData.runner}" style="max-height:260px;max-width:100%;object-fit:contain;" alt="">`;
+}
+function previewAth(inp){readImg(inp.files[0],d=>{athTmp=d;document.getElementById('athPreview').innerHTML=`<img src="${d}" style="max-height:260px;max-width:100%;object-fit:contain;" alt="">`;});}
+function saveAth(){if(athTmp)imgData.runner=athTmp;save('imgData',imgData);flash('athMsg','✅ Imagem salva!');}
+
+// TEXTS
+const txFields=[
+  {key:'h1a',label:'Hero — Linha 1',def:'CORRIDA'},
+  {key:'h1b',label:'Hero — Linha 2 (destaque)',def:'Mulher,'},
+  {key:'h1c',label:'Hero — Linha 3',def:'NÃO SE CALE!'},
+  {key:'heroImpact',label:'Hero — Frase de impacto (HTML ok)',def:'<strong>Cada passo é um ato contra a violência.</strong><br>Esporte, empoderamento e transformação reunidos.',ta:true},
+  {key:'footerDesc',label:'Rodapé — Descrição',def:'Esporte · Conscientização · Transformação',ta:true},
+];
+function renderTexts(){
+  document.getElementById('edGrid').innerHTML=txFields.map(f=>`
+    <div class="ec"><label>${f.label}</label>
+    ${f.ta?`<textarea class="eta" id="ef-${f.key}">${txts[f.key]||f.def}</textarea>`:
+            `<input class="ei" type="text" id="ef-${f.key}" value="${txts[f.key]||f.def}">`}</div>`).join('');
+}
+function saveTexts(){txFields.forEach(f=>txts[f.key]=document.getElementById('ef-'+f.key).value);save('siteTexts',txts);flash('txMsg','✅ Salvo!');}
+
+// GALLERY
+function renderGalAdm(){
+  document.getElementById('galAdm').innerHTML=gallImgs.map((s,i)=>`
+    <div class="gi">
+      <img src="${s}" alt="Foto ${i+1}">
+      <div class="gi-over">
+        <button class="gi-btn" onclick="dlImg('${s}',${i})" title="Baixar"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v8M4.5 6.5L7 9l2.5-2.5M1.5 11.5v1a1 1 0 001 1h9a1 1 0 001-1v-1"/></svg></button>
+        <button class="gi-btn dl" onclick="rmGal(${i})" title="Remover"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 4h11M4.5 4V3a1 1 0 011-1h3a1 1 0 011 1v1M5.5 6.5v4M8.5 6.5v4M2.5 4l1 8a1 1 0 001 1h6a1 1 0 001-1l1-8"/></svg></button>
+      </div>
+    </div>`).join('');
+}
+function addGalImgs(inp){
+  const files=Array.from(inp.files);
+  let done=0;
+  files.forEach(f=>{readImg(f,d=>{gallImgs.push(d);done++;if(done===files.length)renderGalAdm();});});
+  inp.value='';
+}
+function rmGal(i){gallImgs.splice(i,1);renderGalAdm();}
+function saveGal(){save('galleryImgs',gallImgs);flash('galMsg',`✅ ${gallImgs.length} fotos salvas!`);}
+function dlImg(src,i){const a=document.createElement('a');a.href=src;a.download=`foto-${i+1}.jpg`;a.click();}
+function downloadAll(){
+  if(!gallImgs.length){alert('Sem fotos.');return;}
+  gallImgs.forEach((s,i)=>setTimeout(()=>dlImg(s,i),i*200));
+}
+
+// PARCEIROS
+function renderParc(){
+  document.getElementById('parcGrid').innerHTML=parc.map((p,i)=>`
+    <div class="pc"><div class="pcpv"><img src="${p}" alt="Parceiro ${i+1}"></div>
+    <button class="pcr" onclick="rmParc(${i})">✕</button></div>`).join('');
+}
+function addParc(inp){readImg(inp.files[0],d=>{parc.push(d);renderParc();});inp.value='';}
+function rmParc(i){parc.splice(i,1);renderParc();}
+function saveParc(){save('parceiros',parc);flash('parcMsg','✅ Parceiros salvos!');}
+
+// INSTAGRAM
+function renderIG(){
+  document.getElementById('igEdGrid').innerHTML=`
+    <div class="ec"><label>Link do Instagram</label><input class="ei" id="ig-link" value="${igCfg.link||'https://instagram.com/corridamulhernaosetale'}"></div>
+    <div class="ec"><label>@ Handle (sem o @)</label><input class="ei" id="ig-handle" value="${igCfg.handle||'corridamulhernaosetale'}"></div>
+    <div class="ec"><label>Post 1 — Legenda</label><textarea class="eta" id="ig-c1">${igCfg.cap1||'Cada quilômetro percorrido é uma voz que se levanta. 🏃‍♀️💪 #CorridaMulher'}</textarea></div>
+    <div class="ec"><label>Post 2 — Legenda</label><textarea class="eta" id="ig-c2">${igCfg.cap2||'Inscrições abertas! ❤️‍🔥 #InsideBrasil #Brasília2026'}</textarea></div>
+    <div class="ec"><label>Post 3 — Legenda</label><textarea class="eta" id="ig-c3">${igCfg.cap3||'3km, 5km ou 10km — qualquer distância é um ato de coragem. 🎽🏅'}</textarea></div>`;
+}
+function saveIG(){igCfg={link:v('ig-link'),handle:v('ig-handle'),cap1:v('ig-c1'),cap2:v('ig-c2'),cap3:v('ig-c3')};save('igConfig',igCfg);flash('igMsg','✅ Salvo!');}
+
+// HELPERS
+function readImg(file,cb){const r=new FileReader();r.onload=e=>cb(e.target.result);r.readAsDataURL(file);}
+
+async function save(key, data) {
+  // Salva no Firebase E no localStorage (fallback offline)
+  try {
+    if(Array.isArray(data)) {
+      await setDoc(doc(db,'site',key), {list: data});
+    } else {
+      await setDoc(doc(db,'site',key), data);
+    }
+  } catch(e) { console.warn('Firebase write error:', e); }
+  localStorage.setItem(key, JSON.stringify(data));
+}
+function dl(content,name,type){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
+function flash(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.color='#00d060';setTimeout(()=>{el.textContent='';},2500);}
+function v(id){return document.getElementById(id)?.value||'';}
+
+// INIT
+loadFromFirebase().then(() => renderDash());
+
+// Expor funções globais (necessário com type="module")
+window.goto = goto;
+window.saveLogo = saveLogo;
+window.previewLogo = previewLogo;
+window.saveAth = saveAth;
+window.previewAth = previewAth;
+window.saveTexts = saveTexts;
+window.saveGal = saveGal;
+window.addGalImgs = addGalImgs;
+window.rmGal = rmGal;
+window.dlImg = dlImg;
+window.downloadAll = downloadAll;
+window.saveParc = saveParc;
+window.addParc = addParc;
+window.rmParc = rmParc;
+window.saveIG = saveIG;
+window.renderFull = renderFull;
+window.chgSt = chgSt;
+window.delRow = delRow;
+window.clearAll = clearAll;
+window.exportCSV = exportCSV;
+window.exportPDF = exportPDF;
+window.dl = dl;
+</script>
+</body>
+</html>
