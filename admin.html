@@ -119,9 +119,38 @@ tr:hover td{background:rgba(255,31,110,.04);}
 .pa:hover{border-color:var(--pk);}
 .pa svg{width:26px;height:26px;color:rgba(255,255,255,.22);}
 .pa span{font-size:.64rem;color:rgba(255,255,255,.24);letter-spacing:1.5px;text-transform:uppercase;}
+
+/* LOGIN SCREEN */
+#loginScreen{position:fixed;inset:0;background:#080808;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;}
+#loginScreen.hidden{display:none;}
+.ls-box{background:#120a12;border:1px solid rgba(255,31,110,.2);border-radius:24px;padding:48px 42px;width:100%;max-width:400px;animation:lsIn .5s cubic-bezier(.22,1,.36,1);}
+@keyframes lsIn{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.ls-logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1rem;letter-spacing:2px;background:linear-gradient(135deg,#FF1F6E,#FF6B00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
+.ls-sub{font-size:.72rem;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:32px;}
+.ls-label{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);font-weight:600;display:block;margin-bottom:7px;}
+.ls-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:13px 16px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;margin-bottom:14px;transition:border-color .3s;}
+.ls-input:focus{border-color:#FF1F6E;}
+.ls-input::placeholder{color:rgba(255,255,255,.22);}
+.ls-btn{width:100%;background:linear-gradient(135deg,#FF1F6E,#FF6B00);color:#fff;border:none;border-radius:11px;padding:14px;font-family:'Montserrat',sans-serif;font-weight:900;font-size:.88rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:6px;transition:transform .2s,box-shadow .2s;}
+.ls-btn:hover{transform:scale(1.02);box-shadow:0 8px 32px rgba(255,31,110,.4);}
+.ls-err{color:#ff4444;font-size:.78rem;margin-top:8px;display:none;text-align:center;}
+.ls-shake{animation:shake .4s;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
 </style>
 </head>
 <body>
+<div id="loginScreen">
+  <div class="ls-box" id="lsBox">
+    <div class="ls-logo">CORRIDA MULHER</div>
+    <div class="ls-sub">Painel Administrativo</div>
+    <label class="ls-label">Usuario</label>
+    <input class="ls-input" type="text" id="lsUser" placeholder="Digite seu usuario" autocomplete="off">
+    <label class="ls-label">Senha</label>
+    <input class="ls-input" type="password" id="lsPass" placeholder="Digite sua senha">
+    <p class="ls-err" id="lsErr">Usuario ou senha incorretos.</p>
+    <button class="ls-btn" onclick="doAdmLogin()">ENTRAR</button>
+  </div>
+</div>
 
 <!-- SIDEBAR -->
 <aside class="sb">
@@ -303,35 +332,70 @@ function goto(id,el){
 }
 
 // DASHBOARD
+function getMod(r){return r.modalidade||r.mod||'—';}
+function getCam(r){return r.camiseta||r.cam||'—';}
+function getNum(r){return r.numero||r.num||'—';}
+
 function renderDash(){
-  inscs=JSON.parse(localStorage.getItem('inscricoes')||'[]');
   const nv=inscs.filter(r=>r.status==='novo').length;
-  const m3=inscs.filter(r=>r.mod?.includes('3')).length;
-  const m5=inscs.filter(r=>r.mod?.includes('5')).length;
-  const m10=inscs.filter(r=>r.mod?.includes('10')).length;
-  document.getElementById('statCards').innerHTML=`
-    <div class="sc"><div class="scl">Total inscritas</div><div class="scv">${inscs.length}</div><div class="scs">Registros</div></div>
-    <div class="sc"><div class="scl">Novas</div><div class="scv">${nv}</div><div class="scs">Aguardando revisão</div></div>
-    <div class="sc"><div class="scl">Distribuição</div><div class="scv">${m3}·${m5}·${m10}</div><div class="scs">3km · 5km · 10km</div></div>
-    <div class="sc"><div class="scl">Meta</div><div class="scv">${Math.round(inscs.length/2000*100)}%</div><div class="scs">de 2.000 vagas</div></div>`;
-  document.getElementById('recentTbl').innerHTML=inscs.length?tblHTML(inscs.slice(-5).reverse(),false):'<div class="es"><p>Sem inscrições</p></div>';
+  const m3=inscs.filter(r=>getMod(r).includes('3')).length;
+  const m5=inscs.filter(r=>getMod(r).includes('5')).length;
+  const m10=inscs.filter(r=>getMod(r).includes('10')).length;
+  const camSizes=['PP','P','M','G','GG','XGG'];
+  const camCount=camSizes.map(s=>({s,n:inscs.filter(r=>getCam(r).toUpperCase()===s).length})).filter(x=>x.n>0);
+  const camStr=camCount.length?camCount.map(x=>x.s+':'+x.n).join(' · '):'—';
+  document.getElementById('statCards').innerHTML=
+    '<div class="sc"><div class="scl">Total inscritas</div><div class="scv">'+inscs.length+'</div><div class="scs">Registros</div></div>'+
+    '<div class="sc"><div class="scl">Novas</div><div class="scv">'+nv+'</div><div class="scs">Aguardando revisao</div></div>'+
+    '<div class="sc"><div class="scl">Modalidades</div><div class="scv">'+m3+' / '+m5+' / '+m10+'</div><div class="scs">3km / 5km / 10km</div></div>'+
+    '<div class="sc"><div class="scl">Camisetas</div><div class="scv" style="font-size:.82rem;line-height:1.5">'+camStr+'</div><div class="scs">por tamanho</div></div>'+
+    '<div class="sc"><div class="scl">Meta</div><div class="scv">'+Math.round(inscs.length/2000*100)+'%</div><div class="scs">de 2.000 vagas</div></div>';
+  document.getElementById('recentTbl').innerHTML=inscs.length?tblHTML(inscs.slice(-5).reverse(),false):'<div class="es"><p>Sem inscricoes</p></div>';
 }
 
 function tblHTML(data,full){
-  return`<table><thead><tr><th>#</th><th>Nome</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th>${full?'<th>Ações</th>':''}</tr></thead><tbody>${
-    data.map(r=>{const i=inscs.indexOf(r);return`<tr>
-      <td style="font-weight:700;color:rgba(255,255,255,.35);font-size:.76rem">#${r.num||'—'}</td>
-      <td><strong>${r.nome}</strong><br><span style="font-size:.72rem;color:rgba(255,255,255,.32)">${r.email}</span></td>
-      <td>${r.mod}</td><td>${r.cam}</td>
-      <td style="font-size:.74rem;color:rgba(255,255,255,.32)">${r.data}</td>
-      <td><span class="bgg ${r.status==='novo'?'bn':r.status==='lido'?'bl':'bo'}">${{novo:'🔴 Novo',lido:'🟡 Lido',ok:'✅ OK'}[r.status]||r.status}</span></td>
-      ${full?`<td><div class="ta2"><button class="tb2" onclick="chgSt(${i})">Status</button><button class="tb2 dl" onclick="delRow(${i})">✕</button></div></td>`:''}
-    </tr>`;}).join('')
-  }</tbody></table>`;
+  return'<table><thead><tr><th>#</th><th>Nome</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th>'+(full?'<th>Acoes</th>':'')+'</tr></thead><tbody>'+
+    data.map(function(r){var i=inscs.indexOf(r);return'<tr style="cursor:pointer" onclick="verDetalhe('+i+')">'+
+      '<td style="font-weight:700;color:rgba(255,255,255,.35);font-size:.76rem">#'+getNum(r)+'</td>'+
+      '<td><strong>'+r.nome+'</strong><br><span style="font-size:.72rem;color:rgba(255,255,255,.32)">'+r.email+'</span></td>'+
+      '<td>'+getMod(r)+'</td><td>'+getCam(r)+'</td>'+
+      '<td style="font-size:.74rem;color:rgba(255,255,255,.32)">'+r.data+'</td>'+
+      '<td><span class="bgg '+(r.status==='novo'?'bn':r.status==='lido'?'bl':'bo')+'">'+(r.status==='novo'?'Novo':r.status==='lido'?'Lido':'OK')+'</span></td>'+
+      (full?'<td onclick="event.stopPropagation()"><div class="ta2"><button class="tb2" onclick="chgSt('+i+')">Status</button><button class="tb2 dl" onclick="delRow('+i+')">X</button></div></td>':'')+
+    '</tr>';}).join('')+'</tbody></table>';
+}
+
+function verDetalhe(i){
+  var r=inscs[i];if(!r)return;
+  var fields=[
+    ['Numero','#'+getNum(r)],['Modalidade',getMod(r)],['CPF',r.cpf],['Nascimento',r.nasc],
+    ['Sexo',r.sexo],['Camiseta',getCam(r)],['Telefone',r.tel],['Cidade',r.cidade||r.end||'—'],
+    ['E-mail',r.email],['Emergencia',r.emergencia||r.emerg||'—'],['Data inscricao',r.data],['ID',r.id||'—']
+  ];
+  var el=document.createElement('div');
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  el.onclick=function(){el.remove();};
+  el.innerHTML='<div style="background:#120a12;border:1px solid rgba(255,31,110,.3);border-radius:20px;padding:32px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">'+
+    '<div><div style="font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,31,110,.8);margin-bottom:4px;">PARTICIPANTE</div>'+
+    '<h2 style="font-family:Montserrat,sans-serif;font-weight:900;font-size:1.3rem;margin-bottom:6px;">'+r.nome+'</h2>'+
+    '<span style="background:linear-gradient(135deg,#FF1F6E,#FF6B00);color:#fff;padding:3px 12px;border-radius:50px;font-size:.72rem;font-weight:700;">'+getMod(r)+'</span></div>'+
+    '<div style="font-family:Montserrat,sans-serif;font-weight:900;font-size:2.5rem;background:linear-gradient(135deg,#FF1F6E,#FF6B00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">#'+getNum(r)+'</div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">'+
+    fields.map(function(f){return'<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:11px;">'+
+      '<div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px;">'+f[0]+'</div>'+
+      '<div style="font-size:.86rem;font-weight:600;word-break:break-all;">'+(f[1]||'—')+'</div></div>';}).join('')+'</div>'+
+    (r.medicamentos?'<div style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.25);border-radius:10px;padding:12px;margin-bottom:14px;">'+
+      '<div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,107,0,.8);margin-bottom:4px;">CONDICAO MEDICA</div>'+
+      '<div style="font-size:.86rem;">'+r.medicamentos+'</div></div>':'')+
+    '<div style="display:flex;gap:10px;">'+
+    '<button onclick="chgSt('+i+');this.closest(\'div[style*=\\\"position:fixed\\\"]\').remove()" style="flex:1;background:linear-gradient(135deg,#FF1F6E,#FF6B00);color:#fff;border:none;border-radius:10px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">MUDAR STATUS</button>'+
+    '<button onclick="this.closest(\'div[style*=\\\"position:fixed\\\"]\').remove()" style="flex:1;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">FECHAR</button>'+
+    '</div></div>';
+  document.body.appendChild(el);
 }
 
 function renderFull(){
-  inscs=JSON.parse(localStorage.getItem('inscricoes')||'[]');
   const q=(document.getElementById('srcInp')?.value||'').toLowerCase();
   const fd=q?inscs.filter(r=>r.nome?.toLowerCase().includes(q)||r.email?.toLowerCase().includes(q)):inscs;
   document.getElementById('fullTbl').innerHTML=fd.length?tblHTML([...fd].reverse(),true):'<div class="es"><p>Nenhuma encontrada</p></div>';
@@ -343,7 +407,7 @@ function clearAll(){if(!confirm('Excluir TODAS as inscrições?'))return;inscs=[
 function exportCSV(){
   if(!inscs.length){alert('Sem inscrições.');return;}
   const h=['#','Nome','CPF','Email','Telefone','Nascimento','Sexo','Endereço','Emergência','Modalidade','Camiseta','Data','Status'];
-  const rows=inscs.map(r=>[r.num,r.nome,r.cpf,r.email,r.tel,r.nasc,r.sexo,r.end,r.emerg,r.mod,r.cam,r.data,r.status]);
+  const rows=inscs.map(r=>[getNum(r),r.nome,r.cpf,r.email,r.tel,r.nasc,r.sexo,r.cidade||r.end,r.emergencia||r.emerg,getMod(r),getCam(r),r.data,r.status]);
   const bom='\uFEFF';
   dl(bom+[h,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n'),'inscricoes.csv','text/csv');
 }
@@ -412,7 +476,14 @@ const txFields=[
   {key:'h1a',label:'Hero — Linha 1',def:'CORRIDA'},
   {key:'h1b',label:'Hero — Linha 2 (destaque)',def:'Mulher,'},
   {key:'h1c',label:'Hero — Linha 3',def:'NÃO SE CALE!'},
-  {key:'heroImpact',label:'Hero — Frase de impacto',def:'<strong>Cada passo é um ato contra a violência.</strong><br>Esporte, empoderamento e transformação reunidos.',ta:true},
+  {key:'heroImpact',label:'Hero — Frase de impacto (HTML ok)',def:'<strong>Cada passo é um ato contra a violência.</strong><br>Esporte, empoderamento e transformação reunidos.',ta:true},
+  {key:'heroBtn',label:'Hero — Botão CTA',def:'QUERO ME INSCREVER'},
+  {key:'movTitle',label:'O Movimento — Título',def:'Um movimento que nasce da dor e se transforma em força'},
+  {key:'movDesc',label:'O Movimento — Descrição',def:'A Corrida Mulher, Não Se Cale! é mais do que uma corrida.',ta:true},
+  {key:'kitTitle',label:'Kit — Título',def:'Tudo que você precisa para correr.'},
+  {key:'kitDesc',label:'Kit — Descrição',def:'Cada inscrita recebe um kit completo pensado para tornar a experiência ainda mais especial e memorável.',ta:true},
+  {key:'dataEvento',label:'Data do Evento',def:'Outubro 2026'},
+  {key:'localEvento',label:'Local do Evento',def:'Eixão Sul · Brasília/DF'},
   {key:'footerDesc',label:'Rodapé — Descrição',def:'Esporte · Conscientização · Transformação',ta:true},
 ];
 function renderTexts(){
@@ -476,14 +547,51 @@ function saveParc(){save('parceiros',parc);flash('parcMsg','✅ Parceiros salvos
 
 // INSTAGRAM
 function renderIG(){
+  const imgs = igCfg.imgs || [igCfg.img1||'',igCfg.img2||'',igCfg.img3||''];
   document.getElementById('igEdGrid').innerHTML=`
     <div class="ec"><label>Link do Instagram</label><input class="ei" id="ig-link" value="${igCfg.link||'https://instagram.com/corridamulhernaosetale'}"></div>
     <div class="ec"><label>@ Handle (sem o @)</label><input class="ei" id="ig-handle" value="${igCfg.handle||'corridamulhernaosetale'}"></div>
-    <div class="ec"><label>Post 1 — Legenda</label><textarea class="eta" id="ig-c1">${igCfg.cap1||'Cada quilômetro percorrido é uma voz que se levanta. 🏃‍♀️💪 #CorridaMulher'}</textarea></div>
-    <div class="ec"><label>Post 2 — Legenda</label><textarea class="eta" id="ig-c2">${igCfg.cap2||'Inscrições abertas! ❤️‍🔥 #InsideBrasil #Brasília2026'}</textarea></div>
-    <div class="ec"><label>Post 3 — Legenda</label><textarea class="eta" id="ig-c3">${igCfg.cap3||'3km, 5km ou 10km — qualquer distância é um ato de coragem. 🎽🏅'}</textarea></div>`;
+    <div class="ec">
+      <label>Post 1 — Imagem</label>
+      <div style="margin-bottom:8px;">${imgs[0]?`<img src="${imgs[0]}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;">`:''}</div>
+      <label class="lil" for="ig-f1">📁 Escolher imagem</label>
+      <input class="lif" type="file" id="ig-f1" accept="image/*" onchange="previewIgImg(this,0)">
+      <label style="margin-top:10px;display:block;">Legenda</label><textarea class="eta" id="ig-c1">${igCfg.cap1||'Cada quilômetro percorrido é uma voz que se levanta. 🏃‍♀️💪 #CorridaMulher'}</textarea>
+    </div>
+    <div class="ec">
+      <label>Post 2 — Imagem</label>
+      <div style="margin-bottom:8px;">${imgs[1]?`<img src="${imgs[1]}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;">`:''}</div>
+      <label class="lil" for="ig-f2">📁 Escolher imagem</label>
+      <input class="lif" type="file" id="ig-f2" accept="image/*" onchange="previewIgImg(this,1)">
+      <label style="margin-top:10px;display:block;">Legenda</label><textarea class="eta" id="ig-c2">${igCfg.cap2||'Inscrições abertas! ❤️‍🔥 #InsideBrasil #Brasília2026'}</textarea>
+    </div>
+    <div class="ec">
+      <label>Post 3 — Imagem</label>
+      <div style="margin-bottom:8px;">${imgs[2]?`<img src="${imgs[2]}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;">`:''}</div>
+      <label class="lil" for="ig-f3">📁 Escolher imagem</label>
+      <input class="lif" type="file" id="ig-f3" accept="image/*" onchange="previewIgImg(this,2)">
+      <label style="margin-top:10px;display:block;">Legenda</label><textarea class="eta" id="ig-c3">${igCfg.cap3||'3km, 5km ou 10km — qualquer distância é um ato de coragem. 🎽🏅'}</textarea>
+    </div>`;
 }
-function saveIG(){igCfg={link:v('ig-link'),handle:v('ig-handle'),cap1:v('ig-c1'),cap2:v('ig-c2'),cap3:v('ig-c3')};save('igConfig',igCfg);flash('igMsg','✅ Salvo!');}
+async function previewIgImg(inp, idx){
+  if(!inp.files[0]) return;
+  flash('igMsg','⏳ Enviando imagem...');
+  try {
+    const url = await uploadCloudinary(inp.files[0]);
+    if(!igCfg.imgs) igCfg.imgs = ['','',''];
+    igCfg.imgs[idx] = url;
+    renderIG();
+    flash('igMsg','✅ Imagem enviada! Clique em Salvar.');
+  } catch(e) {
+    flash('igMsg','❌ Erro no upload');
+    console.error(e);
+  }
+}
+function saveIG(){
+  if(!igCfg.imgs) igCfg.imgs=['','',''];
+  igCfg={...igCfg,link:v('ig-link'),handle:v('ig-handle'),cap1:v('ig-c1'),cap2:v('ig-c2'),cap3:v('ig-c3'),img1:igCfg.imgs[0]||'',img2:igCfg.imgs[1]||'',img3:igCfg.imgs[2]||''};
+  save('igConfig',igCfg);flash('igMsg','✅ Salvo!');
+}
 
 // HELPERS
 function dl(content,name,type){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
@@ -494,7 +602,7 @@ function v(id){return document.getElementById(id)?.value||'';}
 loadFromFirebase().then(()=>renderDash());
 
 // Expor funções globais
-window.goto=goto; window.saveLogo=saveLogo; window.previewLogo=previewLogo;
+window.goto=goto; window.previewIgImg=previewIgImg; window.saveLogo=saveLogo; window.previewLogo=previewLogo;
 window.saveAth=saveAth; window.previewAth=previewAth; window.saveTexts=saveTexts;
 window.saveGal=saveGal; window.addGalImgs=addGalImgs; window.rmGal=rmGal;
 window.saveParc=saveParc; window.addParc=addParc; window.rmParc=rmParc;
@@ -544,8 +652,34 @@ async function loadFromFirebase() {
   } catch(e) { console.warn('Firebase load error:', e); }
 }
 
+
+function doAdmLogin(){
+  const u=document.getElementById('lsUser').value.trim();
+  const p=document.getElementById('lsPass').value;
+  if(u==='admin'&&p==='mulher2026'){
+    sessionStorage.setItem('adm_ok','1');
+    document.getElementById('loginScreen').classList.add('hidden');
+    loadFromFirebase().then(()=>renderDash());
+  } else {
+    const err=document.getElementById('lsErr');
+    err.style.display='block';
+    const box=document.getElementById('lsBox');
+    box.classList.remove('ls-shake');
+    void box.offsetWidth;
+    box.classList.add('ls-shake');
+    document.getElementById('lsPass').value='';
+    document.getElementById('lsPass').focus();
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!document.getElementById('loginScreen').classList.contains('hidden'))doAdmLogin();
+});
+
 function initAdm() {
-  loadFromFirebase().then(()=>renderDash());
+  if(sessionStorage.getItem('adm_ok')==='1'){
+    document.getElementById('loginScreen').classList.add('hidden');
+    loadFromFirebase().then(()=>renderDash());
+  }
 }
 </script>
 </body>
