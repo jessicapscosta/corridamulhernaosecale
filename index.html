@@ -555,7 +555,7 @@ footer{background:var(--bk);border-top:1px solid rgba(255,255,255,.05);padding:6
 <!-- botão ADM removido -->
 <!-- modal ADM removido -->
 
-<script type="module">
+<script>
 // CURSOR + TRAIL (desktop only)
 const isMobile = window.matchMedia('(max-width:900px)').matches || ('ontouchstart' in window);
 const C=document.getElementById('C'),CR=document.getElementById('CR');
@@ -566,7 +566,6 @@ if(!isMobile){
   document.addEventListener('mousemove',e=>{
     mx=e.clientX;my=e.clientY;
     C.style.left=mx+'px';C.style.top=my+'px';
-    // rastro de luz
     const now=Date.now();
     if(now-lastTrail>18){
       lastTrail=now;
@@ -630,24 +629,9 @@ function countUp(el,t){
 function closeLB(){document.getElementById('lightbox').classList.remove('on');}
 document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===this)closeLB();});
 
-// ══════════════════════════════════════════════
-// FIREBASE CONFIG — substitua pelos seus dados
-// ══════════════════════════════════════════════
-const FB_CONFIG = {
-  apiKey: "AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",
-  authDomain: "corrida-mulher.firebaseapp.com",
-  projectId: "corrida-mulher",
-  storageBucket: "corrida-mulher.firebasestorage.app",
-  messagingSenderId: "545833671209",
-  appId: "1:545833671209:web:3cc2e246aa2baf56af1a38"
-};
-// ══════════════════════════════════════════════
+// Firebase carregado via script module separado (abaixo)
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const fbApp = initializeApp(FB_CONFIG);
-const db = getFirestore(fbApp);
+// db inicializado via script module
 
 function applyData(img, t, ig, parc, gall) {
   if(img.favicon)document.getElementById('fav').href=img.favicon;
@@ -706,12 +690,14 @@ function loadFromCache() {
 async function loadSite(){
   loadFromCache(); // mostra site imediatamente com cache
   try {
+    const db=window._db,_doc=window._doc,_getDoc=window._getDoc;
+    if(!db) throw new Error('Firebase not ready');
     const [imgSnap, txtSnap, igSnap, parcSnap, galSnap] = await Promise.all([
-      getDoc(doc(db,'site','imgData')),
-      getDoc(doc(db,'site','siteTexts')),
-      getDoc(doc(db,'site','igConfig')),
-      getDoc(doc(db,'site','parceiros')),
-      getDoc(doc(db,'site','galleryImgs')),
+      _getDoc(_doc(db,'site','imgData')),
+      _getDoc(_doc(db,'site','siteTexts')),
+      _getDoc(_doc(db,'site','igConfig')),
+      _getDoc(_doc(db,'site','parceiros')),
+      _getDoc(_doc(db,'site','galleryImgs')),
     ]);
     const img  = imgSnap.exists()  ? imgSnap.data()  : {};
     const t    = txtSnap.exists()  ? txtSnap.data()  : {};
@@ -739,7 +725,27 @@ function doLogin(){
 document.getElementById('admp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('loginOv').addEventListener('click',function(e){if(e.target===this)this.classList.remove('on');});
 
-loadSite();
+// loadSite() chamado pelo script module acima
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const FB_CONFIG = {
+  apiKey: "AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",
+  authDomain: "corrida-mulher.firebaseapp.com",
+  projectId: "corrida-mulher",
+  storageBucket: "corrida-mulher.firebasestorage.app",
+  messagingSenderId: "545833671209",
+  appId: "1:545833671209:web:3cc2e246aa2baf56af1a38"
+};
+const fbApp = initializeApp(FB_CONFIG);
+const db = getFirestore(fbApp);
+window._db = db;
+window._doc = doc;
+window._getDoc = getDoc;
+// Chama loadSite depois de Firebase pronto
+if(typeof loadSite === 'function') loadSite();
 </script>
 </body>
 </html>
