@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" id="fav" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
 <title>Inscrição — Corrida Mulher, Não Se Cale!</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
@@ -107,17 +108,51 @@ nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:30px 80px;display:fl
 .btn-home:hover{border-color:var(--pink)}
 /* PRINT STYLES */
 @media print{
-  body{background:#fff!important;color:#000!important}
-  nav,.bg,.ftag,.particle,#formPage,.suc-actions{display:none!important}
-  #successPage{display:block!important;opacity:1!important}
-  .bib-card{border:2px solid #FF1F6E!important;background:#fff!important;break-inside:avoid}
-  .bib-number{-webkit-text-fill-color:#FF1F6E!important}
-  .bib-field span{color:#000!important}
-  .bib-label,.qr-label{color:#555!important}
-  .verified-badge{background:#e8fff0!important;color:#00a844!important;border-color:#00a844!important}
-  .suc-title,.suc-sub,.pg-eyebrow{display:block!important}
-  .success-wrap{padding:20px}
-  #qrCanvas{display:block!important}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body{background:#fff!important;color:#000!important;margin:0;padding:0;}
+  nav,.bg,.ftag,.particle,#formPage,.suc-actions,.steps{display:none!important}
+  #successPage{display:block!important;opacity:1!important;}
+  .wrap{padding:20px!important;max-width:100%!important;}
+  .success-wrap{text-align:center;}
+  .suc-icon,.suc-title,.suc-sub{display:block!important;}
+  .bib-card{
+    border:2px solid #FF1F6E!important;
+    background:#fff!important;
+    border-radius:16px!important;
+    padding:28px!important;
+    max-width:480px!important;
+    margin:20px auto!important;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  .bib-number{
+    color:#FF1F6E!important;
+    -webkit-text-fill-color:#FF1F6E!important;
+    font-size:4rem!important;
+    display:block!important;
+    filter:none!important;
+    animation:none!important;
+  }
+  .bib-mod{
+    background:#FF1F6E!important;
+    color:#fff!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  .bib-label,.qr-label{color:#666!important;font-size:.6rem!important;}
+  .bib-field label{color:#666!important;}
+  .bib-field span{color:#000!important;font-weight:600!important;}
+  .bib-info{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;}
+  .verified-badge{
+    background:#e8fff0!important;
+    color:#00a844!important;
+    border:1px solid #00a844!important;
+    display:inline-flex!important;
+    -webkit-print-color-adjust:exact!important;
+  }
+  .qr-wrap{display:flex!important;flex-direction:column!important;align-items:center!important;gap:8px!important;}
+  #qrCanvas{display:block!important;border-radius:8px!important;}
+  .orb,.bg-grid{display:none!important;}
 }
 @media(max-width:600px){
   .mod-sel{grid-template-columns:1fr}
@@ -349,7 +384,7 @@ function showErr(id,msg,show){
   if(inp)inp.style.borderColor=show?'#ff4444':'';
 }
 
-function submitForm(){
+async function submitForm(){
   const sel=document.querySelector('.mod-opt.selected');
   if(!sel){document.getElementById('modErr').style.display='block';window.scrollTo(0,0);return;}
 
@@ -491,6 +526,23 @@ function drawQR(id,nome,num,mod){
   grd.addColorStop(0,'rgba(255,31,110,.08)');grd.addColorStop(1,'rgba(255,107,0,.08)');
   ctx.fillStyle=grd;ctx.fillRect(0,0,size,size);
 }
+</script>
+
+<script>
+// Favicon dinâmico do Firebase
+(async function(){
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getFirestore,doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const cfg={apiKey:"AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",authDomain:"corrida-mulher.firebaseapp.com",projectId:"corrida-mulher",storageBucket:"corrida-mulher.firebasestorage.app",messagingSenderId:"545833671209",appId:"1:545833671209:web:3cc2e246aa2baf56af1a38"};
+    const app=getApps().find(a=>a.name==='[DEFAULT]')||initializeApp(cfg);
+    const db=getFirestore(app);
+    const snap=await getDoc(doc(db,'site','imgData'));
+    if(snap.exists()&&snap.data().favicon){
+      document.getElementById('fav').href=snap.data().favicon;
+    }
+  }catch(e){}
+})();
 </script>
 </body>
 </html>

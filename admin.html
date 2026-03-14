@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" id="fav" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
 <title>Painel ADM — Corrida Mulher</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -414,7 +415,24 @@ function exportCSV(){
 function exportPDF(){
   if(!inscs.length){alert('Sem inscrições.');return;}
   const w=window.open('','_blank');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inscrições</title><style>body{font-family:Arial;padding:20px;color:#000}h1{color:#FF1F6E;font-size:15px}table{width:100%;border-collapse:collapse;font-size:9.5px}th{background:#FF1F6E;color:#fff;padding:6px 7px;text-align:left}td{padding:5px 7px;border-bottom:1px solid #eee}</style></head><body><h1>Corrida Mulher — Inscrições</h1><p>Total: '+inscs.length+'</p><table><tr><th>#</th><th>Nome</th><th>CPF</th><th>Email</th><th>Tel</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th></tr>'+inscs.map(r=>'<tr><td>'+(r.num||'—')+'</td><td>'+r.nome+'</td><td>'+r.cpf+'</td><td>'+r.email+'</td><td>'+r.tel+'</td><td>'+r.mod+'</td><td>'+r.cam+'</td><td>'+r.data+'</td><td>'+r.status+'</td></tr>').join('')+'</table></body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inscrições</title><style>body{font-family:Arial;padding:20px;color:#000}h1{color:#FF1F6E;font-size:15px}table{width:100%;border-collapse:collapse;font-size:9.5px}th{background:#FF1F6E;color:#fff;padding:6px 7px;text-align:left}td{padding:5px 7px;border-bottom:1px solid #eee}</style></head><body><h1>Corrida Mulher — Inscrições</h1><p>Total: '+inscs.length+'</p><table><tr><th>#</th><th>Nome</th><th>CPF</th><th>Email</th><th>Tel</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th></tr>'+inscs.map(r=>'<tr><td>'+(r.num||'—')+'</td><td>'+r.nome+'</td><td>'+r.cpf+'</td><td>'+r.email+'</td><td>'+r.tel+'</td><td>'+r.mod+'</td><td>'+r.cam+'</td><td>'+r.data+'</td><td>'+r.status+'</td></tr>').join('')+'</table>
+<script>
+// Favicon dinâmico do Firebase
+(async function(){
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getFirestore,doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const cfg={apiKey:"AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",authDomain:"corrida-mulher.firebaseapp.com",projectId:"corrida-mulher",storageBucket:"corrida-mulher.firebasestorage.app",messagingSenderId:"545833671209",appId:"1:545833671209:web:3cc2e246aa2baf56af1a38"};
+    const app=getApps().find(a=>a.name==='[DEFAULT]')||initializeApp(cfg);
+    const db=getFirestore(app);
+    const snap=await getDoc(doc(db,'site','imgData'));
+    if(snap.exists()&&snap.data().favicon){
+      document.getElementById('fav').href=snap.data().favicon;
+    }
+  }catch(e){}
+})();
+</script>
+</body></html>');
   w.document.close();setTimeout(()=>w.print(),500);
 }
 
@@ -681,6 +699,23 @@ function initAdm() {
     loadFromFirebase().then(()=>renderDash());
   }
 }
+</script>
+
+<script>
+// Favicon dinâmico do Firebase
+(async function(){
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getFirestore,doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const cfg={apiKey:"AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",authDomain:"corrida-mulher.firebaseapp.com",projectId:"corrida-mulher",storageBucket:"corrida-mulher.firebasestorage.app",messagingSenderId:"545833671209",appId:"1:545833671209:web:3cc2e246aa2baf56af1a38"};
+    const app=getApps().find(a=>a.name==='[DEFAULT]')||initializeApp(cfg);
+    const db=getFirestore(app);
+    const snap=await getDoc(doc(db,'site','imgData'));
+    if(snap.exists()&&snap.data().favicon){
+      document.getElementById('fav').href=snap.data().favicon;
+    }
+  }catch(e){}
+})();
 </script>
 </body>
 </html>

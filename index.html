@@ -521,9 +521,9 @@ footer{background:var(--bk);border-top:1px solid rgba(255,255,255,.05);padding:6
   <div class="con">
     <div class="igh rv"><span class="sl">Instagram</span><h2 class="st">Siga o <em>movimento</em></h2></div>
     <div class="igg">
-      <div class="igc rv" style="transition-delay:.05s"><div class="igt"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,31,110,.35)" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="rgba(255,31,110,.35)" stroke="none"/></svg></div><div class="igb"><div class="igh2" id="ig1h">@corridamulhernaosetale</div><p class="igcp" id="ig1c">Cada quilômetro percorrido é uma voz que se levanta. Junte-se ao movimento! 🏃‍♀️💪 #CorridaMulher #NãoSeCale</p><p class="igd">Post mais recente</p></div></div>
-      <div class="igc rv" style="transition-delay:.15s"><div class="igt"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,107,0,.35)" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="rgba(255,107,0,.35)" stroke="none"/></svg></div><div class="igb"><div class="igh2" id="ig2h">@corridamulhernaosetale</div><p class="igcp" id="ig2c">Inscrições abertas! Não perca a oportunidade de fazer parte desta história. ❤️‍🔥 #InsideBrasil #Brasília2026</p><p class="igd">2 dias atrás</p></div></div>
-      <div class="igc rv" style="transition-delay:.25s"><div class="igt"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,31,110,.35)" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="rgba(255,31,110,.35)" stroke="none"/></svg></div><div class="igb"><div class="igh2" id="ig3h">@corridamulhernaosetale</div><p class="igcp" id="ig3c">3km, 5km ou 10km — qualquer distância é um ato de coragem. Qual será o seu? 🎽🏅 #EsporteTransforma</p><p class="igd">5 dias atrás</p></div></div>
+      <div class="igc rv" style="transition-delay:.05s"><div class="igt" id="ig1t"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,31,110,.35)" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="rgba(255,31,110,.35)" stroke="none"/></svg></div><div class="igb"><div class="igh2" id="ig1h">@corridamulhernaosetale</div><p class="igcp" id="ig1c">Cada quilômetro percorrido é uma voz que se levanta. Junte-se ao movimento! 🏃‍♀️💪 #CorridaMulher #NãoSeCale</p><p class="igd">Post mais recente</p></div></div>
+      <div class="igc rv" style="transition-delay:.15s"><div class="igt" id="ig2t"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,107,0,.35)" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="rgba(255,107,0,.35)" stroke="none"/></svg></div><div class="igb"><div class="igh2" id="ig2h">@corridamulhernaosetale</div><p class="igcp" id="ig2c">Inscrições abertas! Não perca a oportunidade de fazer parte desta história. ❤️‍🔥 #InsideBrasil #Brasília2026</p><p class="igd">2 dias atrás</p></div></div>
+      <div class="igc rv" style="transition-delay:.25s"><div class="igt" id="ig3t"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,31,110,.35)" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="rgba(255,31,110,.35)" stroke="none"/></svg></div><div class="igb"><div class="igh2" id="ig3h">@corridamulhernaosetale</div><p class="igcp" id="ig3c">3km, 5km ou 10km — qualquer distância é um ato de coragem. Qual será o seu? 🎽🏅 #EsporteTransforma</p><p class="igd">5 dias atrás</p></div></div>
     </div>
     <div class="igbt rv"><a href="#" class="igbtn" id="igMainBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg>Seguir no Instagram</a></div>
   </div>
@@ -657,6 +657,13 @@ function applyData(img, t, ig, parc, gall) {
   if(ig.cap1)document.getElementById('ig1c').textContent=ig.cap1;
   if(ig.cap2)document.getElementById('ig2c').textContent=ig.cap2;
   if(ig.cap3)document.getElementById('ig3c').textContent=ig.cap3;
+  // Fotos dos posts do Instagram
+  const igImgs=[ig.img1||ig.imgs?.[0]||'', ig.img2||ig.imgs?.[1]||'', ig.img3||ig.imgs?.[2]||''];
+  igImgs.forEach((url,i)=>{
+    if(!url)return;
+    const el=document.getElementById('ig'+(i+1)+'t');
+    if(el)el.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;" alt="Post ${i+1}">`;
+  });
 
   const pt=document.getElementById('parcTrack');
   const ph=parc.length
