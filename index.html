@@ -697,9 +697,9 @@ function loadFromCache() {
   const ig   = JSON.parse(localStorage.getItem('igConfig')||'{}');
   const parc = JSON.parse(localStorage.getItem('parceiros')||'[]');
   const gall = JSON.parse(localStorage.getItem('galleryImgs')||'[]');
-  // Só aplica cache se tiver URLs reais (não base64)
-  const hasValidCache = img.logoNav && !img.logoNav.startsWith('data:');
-  if(hasValidCache) applyData(img, t, ig, parc, gall);
+  // Aplica sempre que tiver qualquer dado salvo no cache
+  const hasCache = Object.keys(img).length > 0 || parc.length > 0 || gall.length > 0;
+  if(hasCache) applyData(img, t, ig, parc, gall);
 }
 
 // Atualiza do Firebase em segundo plano
