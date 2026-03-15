@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validar Inscrição — Corrida Mulher</title>
+<link rel="icon" id="fav" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--pk:#FF1F6E;--or:#FF6B00;--g:linear-gradient(135deg,#FF1F6E,#FF6B00);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:#080808;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,31,110,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,31,110,.04) 1px,transparent 1px);background-size:55px 55px;pointer-events:none;z-index:0;}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
+.o1{width:400px;height:400px;background:rgba(255,31,110,.15);top:-100px;left:-100px;}
+.o2{width:300px;height:300px;background:rgba(255,107,0,.12);bottom:-80px;right:-60px;}
+.wrap{position:relative;z-index:1;width:100%;max-width:480px;}
+/* LOGO */
+.logo{text-align:center;margin-bottom:32px;}
+.logo img{height:48px;width:auto;}
+.logo-txt{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1rem;letter-spacing:2px;background:var(--g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+/* LOADING */
+.loading{text-align:center;padding:60px 0;}
+.spinner{width:48px;height:48px;border:3px solid rgba(255,31,110,.2);border-top-color:#FF1F6E;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading p{color:rgba(255,255,255,.5);font-size:.9rem;}
+/* CARD VÁLIDO */
+.card{background:#120a12;border:2px solid rgba(255,31,110,.3);border-radius:22px;padding:36px;text-align:center;animation:fadeUp .6s cubic-bezier(.22,1,.36,1);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.badge-ok{display:inline-flex;align-items:center;gap:8px;background:rgba(0,200,80,.12);border:1px solid rgba(0,200,80,.35);padding:8px 20px;border-radius:50px;font-size:.8rem;font-weight:700;color:#00c850;margin-bottom:24px;}
+.badge-err{display:inline-flex;align-items:center;gap:8px;background:rgba(255,50,50,.12);border:1px solid rgba(255,50,50,.35);padding:8px 20px;border-radius:50px;font-size:.8rem;font-weight:700;color:#ff5555;margin-bottom:24px;}
+.num{font-family:'Montserrat',sans-serif;font-weight:900;font-size:4rem;background:var(--g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:6px;}
+.mod-tag{display:inline-block;background:var(--g);color:#fff;padding:4px 16px;border-radius:50px;font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:28px;}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left;margin-bottom:24px;}
+.field{background:rgba(255,255,255,.04);border-radius:10px;padding:12px;}
+.field label{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);display:block;margin-bottom:3px;}
+.field span{font-size:.88rem;font-weight:600;word-break:break-all;}
+.divider{height:1px;background:rgba(255,255,255,.08);margin:20px 0;}
+.status-badge{display:inline-block;padding:4px 14px;border-radius:50px;font-size:.75rem;font-weight:700;}
+.s-novo{background:rgba(255,31,110,.15);color:var(--pk);}
+.s-lido{background:rgba(255,200,0,.12);color:#ffc800;}
+.s-ok{background:rgba(0,200,80,.12);color:#00c850;}
+/* ERRO */
+.err-card{text-align:center;padding:48px 32px;}
+.err-icon{font-size:3rem;margin-bottom:16px;}
+.err-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.4rem;margin-bottom:8px;}
+.err-sub{color:rgba(255,255,255,.45);font-size:.9rem;margin-bottom:28px;}
+.btn-back{display:inline-block;background:var(--g);color:#fff;padding:12px 32px;border-radius:50px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:transform .3s,box-shadow .3s;}
+.btn-back:hover{transform:scale(1.04);box-shadow:0 8px 30px rgba(255,31,110,.4);}
+.event-info{margin-top:20px;font-size:.75rem;color:rgba(255,255,255,.25);line-height:1.8;}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+
+<div class="wrap">
+  <div class="logo">
+    <img src="https://res.cloudinary.com/dgqxadsmt/image/upload/v1773367140/corrida-mulher/upd6tvk1mbmp29ksii7f.png" alt="Corrida Mulher" onerror="this.style.display='none';document.getElementById('logoTxt').style.display='block'">
+    <div class="logo-txt" id="logoTxt" style="display:none;">CORRIDA MULHER</div>
+  </div>
+
+  <div id="content">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Verificando inscrição...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const FB_CONFIG = {
+  apiKey: "AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",
+  authDomain: "corrida-mulher.firebaseapp.com",
+  projectId: "corrida-mulher",
+  storageBucket: "corrida-mulher.firebasestorage.app",
+  messagingSenderId: "545833671209",
+  appId: "1:545833671209:web:3cc2e246aa2baf56af1a38"
+};
+
+const params = new URLSearchParams(location.search);
+const qrId  = params.get('id');
+const qrNum = params.get('num');
+
+window.addEventListener('load', async function(){
+  const content = document.getElementById('content');
+
+  if(!qrId){
+    showError(content, 'QR Code inválido', 'Este link não contém um ID de inscrição válido.');
+    return;
+  }
+
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const app = initializeApp(FB_CONFIG);
+    const db  = getFirestore(app);
+
+    // Buscar favicon
+    try {
+      const imgSnap = await getDoc(doc(db,'site','imgData'));
+      if(imgSnap.exists() && imgSnap.data().favicon) document.getElementById('fav').href = imgSnap.data().favicon;
+      if(imgSnap.exists() && imgSnap.data().logoNav){
+        const logoEl = document.querySelector('.logo img');
+        if(logoEl) logoEl.src = imgSnap.data().logoNav;
+      }
+    } catch(e){}
+
+    // Buscar inscrições
+    const snap = await getDoc(doc(db,'site','inscricoes'));
+    if(!snap.exists()){
+      showError(content, 'Sem dados', 'Não foi possível encontrar registros de inscrição.');
+      return;
+    }
+
+    const list = snap.data().list || [];
+    const reg  = list.find(r => r.id === qrId || (r.numero||r.num) === qrNum);
+
+    if(!reg){
+      showError(content, 'Inscrição não encontrada', 'O código QR escaneado não corresponde a nenhuma inscrição registrada.');
+      return;
+    }
+
+    showValid(content, reg);
+
+  } catch(e) {
+    console.error(e);
+    // Fallback: tenta localStorage
+    const list = JSON.parse(localStorage.getItem('inscricoes')||'[]');
+    const reg  = list.find(r => r.id === qrId || (r.numero||r.num) === qrNum);
+    if(reg){ showValid(content, reg); }
+    else { showError(content, 'Erro de conexão', 'Não foi possível verificar a inscrição. Tente novamente.'); }
+  }
+});
+
+function getMod(r){ return r.modalidade||r.mod||'—'; }
+function getCam(r){ return r.camiseta||r.cam||'—'; }
+function getNum(r){ return r.numero||r.num||'—'; }
+function getStatus(s){ return s==='ok'?'<span class="status-badge s-ok">✅ Confirmada</span>':s==='lido'?'<span class="status-badge s-lido">🟡 Em análise</span>':'<span class="status-badge s-novo">🔴 Nova</span>'; }
+
+function showValid(el, r){
+  el.innerHTML = `<div class="card">
+    <div class="badge-ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Inscrição verificada — Inside Brasil 2026</div>
+    <div class="num">#${getNum(r)}</div>
+    <div class="mod-tag">${getMod(r)}</div>
+    <div class="fields">
+      <div class="field"><label>Nome</label><span>${r.nome||'—'}</span></div>
+      <div class="field"><label>CPF</label><span>${r.cpf||'—'}</span></div>
+      <div class="field"><label>Nascimento</label><span>${r.nasc||'—'}</span></div>
+      <div class="field"><label>Camiseta</label><span>${getCam(r)}</span></div>
+      <div class="field"><label>Telefone</label><span>${r.tel||'—'}</span></div>
+      <div class="field"><label>Cidade</label><span>${r.cidade||r.end||'—'}</span></div>
+    </div>
+    <div class="divider"></div>
+    <p style="font-size:.78rem;color:rgba(255,255,255,.35);margin-bottom:8px;">Status da inscrição</p>
+    ${getStatus(r.status)}
+    <div class="divider"></div>
+    <div class="event-info">
+      <strong style="color:rgba(255,255,255,.5);">Corrida Mulher, Não Se Cale! 2026</strong><br>
+      Eixão Sul · Brasília/DF · Outubro 2026<br>
+      Inside Brasil
+    </div>
+  </div>`;
+}
+
+function showError(el, title, msg){
+  el.innerHTML = `<div class="card err-card">
+    <div class="err-icon">❌</div>
+    <div class="err-title">${title}</div>
+    <p class="err-sub">${msg}</p>
+    <a href="index.html" class="btn-back">← Voltar ao site</a>
+    <div class="event-info">Corrida Mulher, Não Se Cale! 2026<br>Inside Brasil · Brasília/DF</div>
+  </div>`;
+}
+</script>
+</body>
+</html>

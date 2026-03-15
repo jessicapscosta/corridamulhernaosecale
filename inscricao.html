@@ -276,9 +276,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:30px 80px;display:fl
             <div class="bib-mod" id="bibMod">Corrida 5km</div>
           </div>
           <div style="text-align:right">
-            <div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:.75rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px">CORRIDA MULHER</div>
-            <div style="font-size:.65rem;color:rgba(255,255,255,.4);margin-top:2px">NÃO SE CALE! • 2026</div>
-            <div style="font-size:.65rem;color:rgba(255,255,255,.35);margin-top:2px">Inside Brasil • Brasília/DF</div>
+            <img src="https://res.cloudinary.com/dgqxadsmt/image/upload/v1773367140/corrida-mulher/upd6tvk1mbmp29ksii7f.png" style="height:42px;width:auto;object-fit:contain;" alt="Corrida Mulher">
+            <div style="font-size:.65rem;color:rgba(255,255,255,.35);margin-top:4px">Inside Brasil • Brasília/DF</div>
           </div>
         </div>
         <div class="bib-info">
@@ -292,7 +291,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:30px 80px;display:fl
         <div class="bib-field" style="margin-top:12px"><label>Data da inscrição</label><span id="bData">—</span></div>
         <div class="qr-wrap">
           <div class="qr-label">QR Code de autenticação</div>
-          <canvas id="qrCanvas" width="120" height="120"></canvas>
+          <canvas id="qrCanvas" width="200" height="200"></canvas>
           <div class="verified-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             Inscrição verificada — Inside Brasil 2026
@@ -505,26 +504,32 @@ function enviarEmail(nome, email, num, mod, nasc, camiseta, id, data){
 }
 
 function drawQR(id,nome,num,mod){
+  // URL de validação que o QR code vai abrir
+  const baseUrl = window.location.origin + window.location.pathname.replace('inscricao.html','');
+  const validUrl = baseUrl + 'validar.html?id=' + encodeURIComponent(id) + '&num=' + encodeURIComponent(num);
+  // Usar API pública para gerar QR code real
+  const canvas = document.getElementById('qrCanvas');
+  const img = document.createElement('img');
+  img.onload = function(){ 
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  };
+  img.onerror = function(){ drawQRFallback(id,nome,num,mod); };
+  img.crossOrigin = 'anonymous';
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(validUrl);
+}
+
+function drawQRFallback(id,nome,num,mod){
   const canvas=document.getElementById('qrCanvas');
   const ctx=canvas.getContext('2d');
-  const data=`CORRIDA-MULHER-2026|ID:${id}|NUM:#${num}|ATLETA:${nome}|MOD:${mod}|VERIFICADO:Inside-Brasil`;
+  const data=id+'|'+num+'|'+nome;
   const size=canvas.width;const cells=25;const cell=size/cells;
   ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);
   let hash=0;for(let i=0;i<data.length;i++)hash=(hash<<5)-hash+data.charCodeAt(i)|0;
   const rand=s=>{s=Math.sin(s+hash)*10000;return s-Math.floor(s)};
-  function drawFinder(x,y){
-    ctx.fillStyle='#111';ctx.fillRect(x*cell,y*cell,7*cell,7*cell);
-    ctx.fillStyle='#fff';ctx.fillRect((x+1)*cell,(y+1)*cell,5*cell,5*cell);
-    ctx.fillStyle='#111';ctx.fillRect((x+2)*cell,(y+2)*cell,3*cell,3*cell);
-  }
+  function drawFinder(x,y){ctx.fillStyle='#111';ctx.fillRect(x*cell,y*cell,7*cell,7*cell);ctx.fillStyle='#fff';ctx.fillRect((x+1)*cell,(y+1)*cell,5*cell,5*cell);ctx.fillStyle='#111';ctx.fillRect((x+2)*cell,(y+2)*cell,3*cell,3*cell);}
   drawFinder(0,0);drawFinder(cells-7,0);drawFinder(0,cells-7);
-  for(let r=0;r<cells;r++){for(let c=0;c<cells;c++){
-    if((r<8&&c<8)||(r<8&&c>cells-9)||(r>cells-9&&c<8))continue;
-    if(rand(r*cells+c)>.45){ctx.fillStyle='#111';ctx.fillRect(c*cell,r*cell,cell,cell)}
-  }}
-  const grd=ctx.createLinearGradient(0,0,size,size);
-  grd.addColorStop(0,'rgba(255,31,110,.08)');grd.addColorStop(1,'rgba(255,107,0,.08)');
-  ctx.fillStyle=grd;ctx.fillRect(0,0,size,size);
+  for(let r=0;r<cells;r++){for(let c2=0;c2<cells;c2++){if((r<8&&c2<8)||(r<8&&c2>cells-9)||(r>cells-9&&c2<8))continue;if(rand(r*cells+c2)>.45){ctx.fillStyle='#111';ctx.fillRect(c2*cell,r*cell,cell,cell)}}}
 }
 </script>
 
