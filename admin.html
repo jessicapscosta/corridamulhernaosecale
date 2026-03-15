@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" id="fav" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
 <title>Painel ADM — Corrida Mulher</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -121,7 +120,7 @@ tr:hover td{background:rgba(255,31,110,.04);}
 .pa svg{width:26px;height:26px;color:rgba(255,255,255,.22);}
 .pa span{font-size:.64rem;color:rgba(255,255,255,.24);letter-spacing:1.5px;text-transform:uppercase;}
 
-/* LOGIN SCREEN */
+/* LOGIN */
 #loginScreen{position:fixed;inset:0;background:#080808;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;}
 #loginScreen.hidden{display:none;}
 .ls-box{background:#120a12;border:1px solid rgba(255,31,110,.2);border-radius:24px;padding:48px 42px;width:100%;max-width:400px;animation:lsIn .5s cubic-bezier(.22,1,.36,1);}
@@ -144,11 +143,11 @@ tr:hover td{background:rgba(255,31,110,.04);}
   <div class="ls-box" id="lsBox">
     <div class="ls-logo">CORRIDA MULHER</div>
     <div class="ls-sub">Painel Administrativo</div>
-    <label class="ls-label">Usuario</label>
-    <input class="ls-input" type="text" id="lsUser" placeholder="Digite seu usuario" autocomplete="off">
+    <label class="ls-label">Usuário</label>
+    <input class="ls-input" type="text" id="lsUser" placeholder="Digite seu usuário" autocomplete="off">
     <label class="ls-label">Senha</label>
     <input class="ls-input" type="password" id="lsPass" placeholder="Digite sua senha">
-    <p class="ls-err" id="lsErr">Usuario ou senha incorretos.</p>
+    <p class="ls-err" id="lsErr">Usuário ou senha incorretos.</p>
     <button class="ls-btn" onclick="doAdmLogin()">ENTRAR</button>
   </div>
 </div>
@@ -265,12 +264,9 @@ tr:hover td{background:rgba(255,31,110,.04);}
   </div>
 </div>
 
-<script>
-// Carrega Firebase dinamicamente e inicializa tudo
-</script>
+
 
 <script>
-
 const FB_CONFIG = {
   apiKey: "AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",
   authDomain: "corrida-mulher.firebaseapp.com",
@@ -280,23 +276,14 @@ const FB_CONFIG = {
   appId: "1:545833671209:web:3cc2e246aa2baf56af1a38"
 };
 
-window._fbReady = false;
-(async function() {
-  try {
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-    const { getFirestore, doc, setDoc, getDoc, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    window._fbLib = { initializeApp, getFirestore, doc, setDoc, getDoc, collection, getDocs };
-    const fbApp = initializeApp(FB_CONFIG);
-    window._db = getFirestore(fbApp);
-    window._fbReady = true;
-  } catch(e) { console.warn('Firebase init error:', e); }
-  // Espera scripts carregarem antes de chamar initAdm
-  if(document.readyState === 'complete') {
-    if(typeof initAdm === 'function') initAdm();
-  } else {
-    window.addEventListener('load', () => { if(typeof initAdm === 'function') initAdm(); });
-  }
-})();
+const FB_CONFIG = {
+  apiKey: "AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",
+  authDomain: "corrida-mulher.firebaseapp.com",
+  projectId: "corrida-mulher",
+  storageBucket: "corrida-mulher.firebasestorage.app",
+  messagingSenderId: "545833671209",
+  appId: "1:545833671209:web:3cc2e246aa2baf56af1a38"
+};
 // Firebase inicializado acima via import dinâmico
 
 // CLOUDINARY
@@ -338,12 +325,10 @@ function goto(id,el){
 }
 
 // DASHBOARD
-function getMod(r){return r.modalidade||r.mod||'—';}
-function getCam(r){return r.camiseta||r.cam||'—';}
-function getNum(r){return r.numero||r.num||'—';}
-
 function renderDash(){
   const nv=inscs.filter(r=>r.status==='novo').length;
+  const getMod=r=>r.modalidade||r.mod||'';
+  const getCam=r=>r.camiseta||r.cam||'';
   const m3=inscs.filter(r=>getMod(r).includes('3')).length;
   const m5=inscs.filter(r=>getMod(r).includes('5')).length;
   const m10=inscs.filter(r=>getMod(r).includes('10')).length;
@@ -352,52 +337,66 @@ function renderDash(){
   const camStr=camCount.length?camCount.map(x=>x.s+':'+x.n).join(' · '):'—';
   document.getElementById('statCards').innerHTML=
     '<div class="sc"><div class="scl">Total inscritas</div><div class="scv">'+inscs.length+'</div><div class="scs">Registros</div></div>'+
-    '<div class="sc"><div class="scl">Novas</div><div class="scv">'+nv+'</div><div class="scs">Aguardando revisao</div></div>'+
-    '<div class="sc"><div class="scl">Modalidades</div><div class="scv">'+m3+' / '+m5+' / '+m10+'</div><div class="scs">3km / 5km / 10km</div></div>'+
-    '<div class="sc"><div class="scl">Camisetas</div><div class="scv" style="font-size:.82rem;line-height:1.5">'+camStr+'</div><div class="scs">por tamanho</div></div>'+
+    '<div class="sc"><div class="scl">Novas</div><div class="scv">'+nv+'</div><div class="scs">Aguardando revisão</div></div>'+
+    '<div class="sc"><div class="scl">Modalidades</div><div class="scv">'+m3+' · '+m5+' · '+m10+'</div><div class="scs">3km · 5km · 10km</div></div>'+
+    '<div class="sc"><div class="scl">Camisetas</div><div class="scv" style="font-size:.85rem;line-height:1.5">'+camStr+'</div><div class="scs">por tamanho</div></div>'+
     '<div class="sc"><div class="scl">Meta</div><div class="scv">'+Math.round(inscs.length/2000*100)+'%</div><div class="scs">de 2.000 vagas</div></div>';
-  document.getElementById('recentTbl').innerHTML=inscs.length?tblHTML(inscs.slice(-5).reverse(),false):'<div class="es"><p>Sem inscricoes</p></div>';
+  document.getElementById('recentTbl').innerHTML=inscs.length?tblHTML(inscs.slice(-5).reverse(),false):'<div class="es"><p>Sem inscrições</p></div>';
 }
 
 function tblHTML(data,full){
-  return'<table><thead><tr><th>#</th><th>Nome</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th>'+(full?'<th>Acoes</th>':'')+'</tr></thead><tbody>'+
-    data.map(function(r){var i=inscs.indexOf(r);return'<tr style="cursor:pointer" onclick="verDetalhe('+i+')">'+
-      '<td style="font-weight:700;color:rgba(255,255,255,.35);font-size:.76rem">#'+getNum(r)+'</td>'+
-      '<td><strong>'+r.nome+'</strong><br><span style="font-size:.72rem;color:rgba(255,255,255,.32)">'+r.email+'</span></td>'+
-      '<td>'+getMod(r)+'</td><td>'+getCam(r)+'</td>'+
-      '<td style="font-size:.74rem;color:rgba(255,255,255,.32)">'+r.data+'</td>'+
-      '<td><span class="bgg '+(r.status==='novo'?'bn':r.status==='lido'?'bl':'bo')+'">'+(r.status==='novo'?'Novo':r.status==='lido'?'Lido':'OK')+'</span></td>'+
-      (full?'<td onclick="event.stopPropagation()"><div class="ta2"><button class="tb2" onclick="chgSt('+i+')">Status</button><button class="tb2 dl" onclick="delRow('+i+')">X</button></div></td>':'')+
-    '</tr>';}).join('')+'</tbody></table>';
+  const getMod=r=>r.modalidade||r.mod||'—';
+  const getCam=r=>r.camiseta||r.cam||'—';
+  const getNum=r=>r.numero||r.num||'—';
+  return`<table><thead><tr><th>#</th><th>Nome</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th>${full?'<th>Ações</th>':''}</tr></thead><tbody>${
+    data.map(r=>{const i=inscs.indexOf(r);return`<tr style="cursor:pointer" onclick="verDetalhe(${i})">
+      <td style="font-weight:700;color:rgba(255,255,255,.35);font-size:.76rem">#${getNum(r)}</td>
+      <td><strong>${r.nome}</strong><br><span style="font-size:.72rem;color:rgba(255,255,255,.32)">${r.email}</span></td>
+      <td>${getMod(r)}</td><td>${getCam(r)}</td>
+      <td style="font-size:.74rem;color:rgba(255,255,255,.32)">${r.data}</td>
+      <td><span class="bgg ${r.status==='novo'?'bn':r.status==='lido'?'bl':'bo'}">${{novo:'🔴 Novo',lido:'🟡 Lido',ok:'✅ OK'}[r.status]||r.status}</span></td>
+      ${full?`<td onclick="event.stopPropagation()"><div class="ta2"><button class="tb2" onclick="chgSt(${i})">Status</button><button class="tb2 dl" onclick="delRow(${i})">✕</button></div></td>`:''}
+    </tr>`;}).join('')
+  }</tbody></table>`;
 }
 
 function verDetalhe(i){
-  var r=inscs[i];if(!r)return;
-  var fields=[
-    ['Numero','#'+getNum(r)],['Modalidade',getMod(r)],['CPF',r.cpf],['Nascimento',r.nasc],
-    ['Sexo',r.sexo],['Camiseta',getCam(r)],['Telefone',r.tel],['Cidade',r.cidade||r.end||'—'],
-    ['E-mail',r.email],['Emergencia',r.emergencia||r.emerg||'—'],['Data inscricao',r.data],['ID',r.id||'—']
+  const r=inscs[i];if(!r)return;
+  const mod=r.modalidade||r.mod||'—';
+  const cam=r.camiseta||r.cam||'—';
+  const num=r.numero||r.num||'—';
+  const fields=[
+    ['CPF',r.cpf],['Nascimento',r.nasc],['Sexo',r.sexo],['Camiseta',cam],
+    ['Telefone',r.tel],['Cidade',r.cidade||r.end||'—'],
+    ['E-mail',r.email],['Emergência',r.emergencia||r.emerg||'—'],
+    ['Data inscrição',r.data],['ID',r.id||'—']
   ];
-  var el=document.createElement('div');
-  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-  el.onclick=function(){el.remove();};
-  el.innerHTML='<div style="background:#120a12;border:1px solid rgba(255,31,110,.3);border-radius:20px;padding:32px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">'+
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">'+
-    '<div><div style="font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,31,110,.8);margin-bottom:4px;">PARTICIPANTE</div>'+
-    '<h2 style="font-family:Montserrat,sans-serif;font-weight:900;font-size:1.3rem;margin-bottom:6px;">'+r.nome+'</h2>'+
-    '<span style="background:linear-gradient(135deg,#FF1F6E,#FF6B00);color:#fff;padding:3px 12px;border-radius:50px;font-size:.72rem;font-weight:700;">'+getMod(r)+'</span></div>'+
-    '<div style="font-family:Montserrat,sans-serif;font-weight:900;font-size:2.5rem;background:linear-gradient(135deg,#FF1F6E,#FF6B00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">#'+getNum(r)+'</div></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">'+
-    fields.map(function(f){return'<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:11px;">'+
-      '<div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px;">'+f[0]+'</div>'+
-      '<div style="font-size:.86rem;font-weight:600;word-break:break-all;">'+(f[1]||'—')+'</div></div>';}).join('')+'</div>'+
-    (r.medicamentos?'<div style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.25);border-radius:10px;padding:12px;margin-bottom:14px;">'+
-      '<div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,107,0,.8);margin-bottom:4px;">CONDICAO MEDICA</div>'+
-      '<div style="font-size:.86rem;">'+r.medicamentos+'</div></div>':'')+
-    '<div style="display:flex;gap:10px;">'+
-    '<button onclick="chgSt('+i+');this.closest(\'div[style*=\\\"position:fixed\\\"]\').remove()" style="flex:1;background:linear-gradient(135deg,#FF1F6E,#FF6B00);color:#fff;border:none;border-radius:10px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">MUDAR STATUS</button>'+
-    '<button onclick="this.closest(\'div[style*=\\\"position:fixed\\\"]\').remove()" style="flex:1;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">FECHAR</button>'+
-    '</div></div>';
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  el.onclick=e=>{if(e.target===el)el.remove();};
+  el.innerHTML=`<div style="background:#120a12;border:1px solid rgba(255,31,110,.3);border-radius:20px;padding:32px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:16px;">
+      <div>
+        <div style="font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,31,110,.8);margin-bottom:4px;">PARTICIPANTE</div>
+        <h2 style="font-family:Montserrat,sans-serif;font-weight:900;font-size:1.3rem;margin-bottom:8px;">${r.nome}</h2>
+        <span style="background:linear-gradient(135deg,#FF1F6E,#FF6B00);color:#fff;padding:3px 14px;border-radius:50px;font-size:.72rem;font-weight:700;">${mod}</span>
+      </div>
+      <div style="font-family:Montserrat,sans-serif;font-weight:900;font-size:2.5rem;background:linear-gradient(135deg,#FF1F6E,#FF6B00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;">#${num}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+      ${fields.map(([l,v])=>`<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:11px;">
+        <div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px;">${l}</div>
+        <div style="font-size:.86rem;font-weight:600;word-break:break-all;">${v||'—'}</div>
+      </div>`).join('')}
+    </div>
+    ${r.medicamentos?`<div style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.25);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,107,0,.8);margin-bottom:4px;">CONDIÇÃO MÉDICA</div>
+      <div style="font-size:.86rem;">${r.medicamentos}</div></div>`:''}
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button onclick="chgSt(${i});document.querySelector('[style*=z-index: 9999]')?.remove()" style="flex:1;background:linear-gradient(135deg,#FF1F6E,#FF6B00);color:#fff;border:none;border-radius:10px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">MUDAR STATUS</button>
+      <button onclick="this.closest('[style]').parentElement.remove()" style="flex:1;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">FECHAR</button>
+    </div>
+  </div>`;
   document.body.appendChild(el);
 }
 
@@ -413,31 +412,14 @@ function clearAll(){if(!confirm('Excluir TODAS as inscrições?'))return;inscs=[
 function exportCSV(){
   if(!inscs.length){alert('Sem inscrições.');return;}
   const h=['#','Nome','CPF','Email','Telefone','Nascimento','Sexo','Endereço','Emergência','Modalidade','Camiseta','Data','Status'];
-  const rows=inscs.map(r=>[getNum(r),r.nome,r.cpf,r.email,r.tel,r.nasc,r.sexo,r.cidade||r.end,r.emergencia||r.emerg,getMod(r),getCam(r),r.data,r.status]);
+  const rows=inscs.map(r=>[r.numero||r.num,r.nome,r.cpf,r.email,r.tel,r.nasc,r.sexo,r.cidade||r.end,r.emergencia||r.emerg,r.modalidade||r.mod,r.camiseta||r.cam,r.data,r.status]);
   const bom='\uFEFF';
   dl(bom+[h,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n'),'inscricoes.csv','text/csv');
 }
 function exportPDF(){
   if(!inscs.length){alert('Sem inscrições.');return;}
   const w=window.open('','_blank');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inscrições</title><style>body{font-family:Arial;padding:20px;color:#000}h1{color:#FF1F6E;font-size:15px}table{width:100%;border-collapse:collapse;font-size:9.5px}th{background:#FF1F6E;color:#fff;padding:6px 7px;text-align:left}td{padding:5px 7px;border-bottom:1px solid #eee}</style></head><body><h1>Corrida Mulher — Inscrições</h1><p>Total: '+inscs.length+'</p><table><tr><th>#</th><th>Nome</th><th>CPF</th><th>Email</th><th>Tel</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th></tr>'+inscs.map(r=>'<tr><td>'+(r.num||'—')+'</td><td>'+r.nome+'</td><td>'+r.cpf+'</td><td>'+r.email+'</td><td>'+r.tel+'</td><td>'+r.mod+'</td><td>'+r.cam+'</td><td>'+r.data+'</td><td>'+r.status+'</td></tr>').join('')+'</table>
-<script>
-// Favicon dinâmico do Firebase
-(async function(){
-  try{
-    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const {getFirestore,doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const cfg={apiKey:"AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",authDomain:"corrida-mulher.firebaseapp.com",projectId:"corrida-mulher",storageBucket:"corrida-mulher.firebasestorage.app",messagingSenderId:"545833671209",appId:"1:545833671209:web:3cc2e246aa2baf56af1a38"};
-    const app=getApps().find(a=>a.name==='[DEFAULT]')||initializeApp(cfg);
-    const db=getFirestore(app);
-    const snap=await getDoc(doc(db,'site','imgData'));
-    if(snap.exists()&&snap.data().favicon){
-      document.getElementById('fav').href=snap.data().favicon;
-    }
-  }catch(e){}
-})();
-</script>
-</body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inscrições</title><style>body{font-family:Arial;padding:20px;color:#000}h1{color:#FF1F6E;font-size:15px}table{width:100%;border-collapse:collapse;font-size:9.5px}th{background:#FF1F6E;color:#fff;padding:6px 7px;text-align:left}td{padding:5px 7px;border-bottom:1px solid #eee}</style></head><body><h1>Corrida Mulher — Inscrições</h1><p>Total: '+inscs.length+'</p><table><tr><th>#</th><th>Nome</th><th>CPF</th><th>Email</th><th>Tel</th><th>Modalidade</th><th>Camiseta</th><th>Data</th><th>Status</th></tr>'+inscs.map(r=>'<tr><td>'+(r.num||'—')+'</td><td>'+r.nome+'</td><td>'+r.cpf+'</td><td>'+r.email+'</td><td>'+r.tel+'</td><td>'+r.mod+'</td><td>'+r.cam+'</td><td>'+r.data+'</td><td>'+r.status+'</td></tr>').join('')+'</table></body></html>');
   w.document.close();setTimeout(()=>w.print(),500);
 }
 
@@ -675,7 +657,11 @@ async function loadFromFirebase() {
   } catch(e) { console.warn('Firebase load error:', e); }
 }
 
+function initAdm() {
+  loadFromFirebase().then(()=>renderDash());
+}
 
+/* ── TELA DE LOGIN ── */
 function doAdmLogin(){
   const u=document.getElementById('lsUser').value.trim();
   const p=document.getElementById('lsPass').value;
@@ -695,32 +681,28 @@ function doAdmLogin(){
   }
 }
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&!document.getElementById('loginScreen').classList.contains('hidden'))doAdmLogin();
+  if(e.key==='Enter'){
+    const ls=document.getElementById('loginScreen');
+    if(ls&&!ls.classList.contains('hidden'))doAdmLogin();
+  }
 });
 
-function initAdm() {
+/* Inicializa Firebase e verifica sessão após página carregar */
+window.addEventListener('load', async function(){
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, setDoc, getDoc, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    window._fbLib = { initializeApp, getFirestore, doc, setDoc, getDoc, collection, getDocs };
+    const fbApp = initializeApp(FB_CONFIG);
+    window._db = getFirestore(fbApp);
+  } catch(e) { console.warn('Firebase init error:', e); }
+  // Após Firebase pronto, verificar login
   if(sessionStorage.getItem('adm_ok')==='1'){
     document.getElementById('loginScreen').classList.add('hidden');
     loadFromFirebase().then(()=>renderDash());
   }
-}
-</script>
-
-<script>
-// Favicon dinâmico do Firebase
-(async function(){
-  try{
-    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const {getFirestore,doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const cfg={apiKey:"AIzaSyBzLwCF7ld_zf0oWvwevFU6gnB71cL3pcE",authDomain:"corrida-mulher.firebaseapp.com",projectId:"corrida-mulher",storageBucket:"corrida-mulher.firebasestorage.app",messagingSenderId:"545833671209",appId:"1:545833671209:web:3cc2e246aa2baf56af1a38"};
-    const app=getApps().find(a=>a.name==='[DEFAULT]')||initializeApp(cfg);
-    const db=getFirestore(app);
-    const snap=await getDoc(doc(db,'site','imgData'));
-    if(snap.exists()&&snap.data().favicon){
-      document.getElementById('fav').href=snap.data().favicon;
-    }
-  }catch(e){}
-})();
+  // else: mostra tela de login (já visível por padrão)
+});
 </script>
 </body>
 </html>
